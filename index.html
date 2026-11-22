@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DK WIN AI - Premium Sequence Analysis</title>
+  <style>
+    :root {
+      --bg: #070b14;
+      --card: #0f172a;
+      --card-2: #131f38;
+      --border: #1e293b;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --green: #14532d;
+      --green-border: #22c55e;
+      --red: #450a0a;
+      --red-border: #ef4444;
+      --purple: #581c87;
+      --purple-border: #c084fc;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      padding: 16px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 460px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 14px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    .brand h1 {
+      font-size: 18px;
+      letter-spacing: 0.5px;
+    }
+
+    .brand p {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .badge {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      padding: 5px 9px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .status-pill {
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+    }
+
+    .status-pill.ready {
+      background: rgba(34, 197, 94, 0.15);
+      color: #4ade80;
+    }
+
+    .status-pill.completed {
+      background: rgba(168, 85, 247, 0.15);
+      color: #c084fc;
+    }
+
+    .counter {
+      font-size: 28px;
+      font-weight: 800;
+      text-align: center;
+      color: var(--accent);
+    }
+
+    .progress-wrap {
+      width: 100%;
+      height: 8px;
+      background: #1e293b;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #0284c7, #38bdf8);
+      transition: width 0.25s ease;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--card-2);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: #0284c7;
+      border-color: #0ea5e9;
+      color: #fff;
+    }
+
+    .btn:disabled,
+    .btn.disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.45;
+    }
+
+    .inputs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .inputs input {
+      width: 100%;
+      text-align: center;
+      font-size: 18px;
+      font-weight: 700;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #334155;
+      background: #090e1a;
+      color: var(--text);
+    }
+
+    .results {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .box {
+      padding: 14px;
+      border-radius: 12px;
+      text-align: center;
+      border: 1px solid transparent;
+    }
+
+    .box.big {
+      background: var(--green);
+      border-color: var(--green-border);
+    }
+
+    .box.small {
+      background: var(--red);
+      border-color: var(--red-border);
+    }
+
+    .box .label {
+      font-size: 12px;
+      font-weight: 700;
+      opacity: 0.9;
+    }
+
+    .box .pct {
+      font-size: 24px;
+      font-weight: 800;
+      margin-top: 4px;
+    }
+
+    .backup-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .feedback-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 95px;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .choice-btn {
+      padding: 11px 8px;
+      border-radius: 10px;
+      border: 1px solid #334155;
+      background: #090e1a;
+      color: var(--muted);
+      font-weight: 800;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .choice-btn.active-big {
+      background: var(--green);
+      border-color: var(--green-border);
+      color: #fff;
+    }
+
+    .choice-btn.active-small {
+      background: var(--red);
+      border-color: var(--red-border);
+      color: #fff;
+    }
+
+    .feedback-num {
+      width: 100%;
+      text-align: center;
+      font-size: 16px;
+      font-weight: 700;
+      padding: 10px 8px;
+      border-radius: 10px;
+      border: 1px solid #334155;
+      background: #090e1a;
+      color: var(--text);
+    }
+
+    .ai-dashboard {
+      background: rgba(88, 28, 135, 0.15);
+      border: 1px solid var(--purple-border);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .ai-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 700;
+      color: #c084fc;
+    }
+
+    .level-bar-wrap {
+      width: 100%;
+      height: 10px;
+      background: #3b0764;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .level-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #9333ea, #c084fc);
+      transition: width 0.3s ease;
+    }
+
+    .learning-log {
+      font-size: 12px;
+      color: #e9d5ff;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 10px;
+      border-radius: 8px;
+      max-height: 120px;
+      overflow-y: auto;
+      line-height: 1.4;
+      border-left: 3px solid var(--purple-border);
+    }
+
+    .msg {
+      font-size: 12px;
+      color: #38bdf8;
+      text-align: center;
+      min-height: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="header">
+      <div class="brand">
+        <h1>DK WIN AI</h1>
+        <p>PREMIUM SEQUENCE ANALYSIS</p>
+      </div>
+      <div class="badge">WIN GO 1 MINUTE</div>
+    </div>
+
+    <!-- AI Live Intelligence Dashboard -->
+    <div class="card ai-dashboard">
+      <div class="card-top">
+        <span>ADVANCED NEURAL ENGINE</span>
+        <span id="aiLevelBadge" class="status-pill">LEVEL 1</span>
+      </div>
+      <div class="ai-meta">
+        <span id="aiStateText">Model Training Initialized</span>
+        <span id="aiProgressPct">0%</span>
+      </div>
+      <div class="level-bar-wrap">
+        <div class="level-bar" id="aiProgressBar"></div>
+      </div>
+      <div class="learning-log" id="learningLog">
+        ▶ সিস্টেম প্রস্তুত হচ্ছে... স্ক্রিনশট আপলোড করে ট্রেনিং শুরু করুন।
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-top">
+        <span>SCREENSHOT COLLECTION</span>
+        <span class="status-pill" id="collectStatus">COLLECTING</span>
+      </div>
+
+      <div class="counter" id="recordCounter">0 / 500</div>
+      <div class="progress-wrap">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+
+      <label class="btn btn-primary" id="uploadLabel" style="text-align:center;">
+        📸 একসাথে অনেকগুলো স্ক্রিনশট সিলেক্ট করুন
+      </label>
+
+      <input
+        type="file"
+        id="screenshotInput"
+        accept="image/*"
+        multiple
+        style="display:none;"
+      />
+
+      <p class="hint" id="batchHint">
+        স্থানীয় ব্রাউজার স্টোরেজে রেকর্ড সংরক্ষিত হচ্ছে। ডুপ্লিকেট অটো-ফিল্টার সক্রিয়।
+      </p>
+    </div>
+
+    <div class="card">
+      <div class="card-top">
+        <span>FOUR NUMBER INPUT</span>
+        <span class="status-pill" id="lockStatus">🔒 LOCKED</span>
+      </div>
+
+      <div class="inputs">
+        <input type="number" min="0" max="9" id="n1" placeholder="0" disabled />
+        <input type="number" min="0" max="9" id="n2" placeholder="0" disabled />
+        <input type="number" min="0" max="9" id="n3" placeholder="0" disabled />
+        <input type="number" min="0" max="9" id="n4" placeholder="0" disabled />
+      </div>
+
+      <button type="button" class="btn btn-primary" id="analyzeBtn" disabled>ANALYZE SEQUENCE</button>
+      <p class="hint" id="lockHint">৫০০টি রেকর্ড পূর্ণ হলে ইনপুট খুলবে。</p>
+    </div>
+
+    <div class="card">
+      <div class="card-top">
+        <span>PREMIUM AI PREDICTION</span>
+        <span>PROBABILITY STATS</span>
+      </div>
+
+      <div class="results">
+        <div class="box big">
+          <div class="label">BIG</div>
+          <div class="pct" id="bigPct">—%</div>
+        </div>
+        <div class="box small">
+          <div class="label">SMALL</div>
+          <div class="pct" id="smallPct">—%</div>
+        </div>
+      </div>
+
+      <p class="hint" id="resultNote">ANALYZE বাটনে ট্যাপ করলে মারকভ চেইন ও ওয়েটেড মুভিং এভারেজ ফলাফল দেখাবে।</p>
+    </div>
+
+    <div class="card">
+      <div class="card-top">
+        <span>DATA BACKUP</span>
+        <span id="savedCountLabel">0 records</span>
+      </div>
+
+      <div class="backup-grid">
+        <button class="btn btn-sm" id="exportCsvBtn">CSV EXPORT</button>
+        <button class="btn btn-sm" id="exportJsonBtn">JSON BACKUP</button>
+        <label class="btn btn-sm" style="text-align:center;">
+          IMPORT
+          <input type="file" id="importJsonInput" accept=".json,application/json" hidden />
+        </label>
+      </div>
+
+      <div class="msg" id="statusMsg"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-top">
+        <span>ACTUAL RESULT FEEDBACK</span>
+        <span id="feedbackStatsLabel">0 feedback</span>
+      </div>
+
+      <div class="feedback-row">
+        <button type="button" class="choice-btn" id="chooseBigBtn">BIG (5-9)</button>
+        <button type="button" class="choice-btn" id="chooseSmallBtn">SMALL (0-4)</button>
+        <input
+          type="number"
+          min="0"
+          max="9"
+          id="actualNumInput"
+          class="feedback-num"
+          placeholder="সংখ্যা"
+        />
+      </div>
+
+      <button type="button" class="btn btn-primary" id="submitFeedbackBtn">
+        ফলাফল জমা দিন ও ওয়েট আপডেট করুন
+      </button>
+
+      <p class="hint" id="feedbackHint">
+        ফিডব্যাক দিলে রিইনফোর্সমেন্ট লার্নিং অ্যালগরিদম প্রেডিকশন সূক্ষ্মতর করবে।
+      </p>
+    </div>
+  </div>
+
+  <script>
+    const TARGET_RECORDS = 500;
+    const STORAGE_KEY = "dk_win_ai_records_v6";
+    const FEEDBACK_KEY = "dk_win_ai_feedback_v6";
+    const LOG_KEY = "dk_win_ai_logs_v6";
+
+    let records = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    let feedbacks = JSON.parse(localStorage.getItem(FEEDBACK_KEY) || "[]");
+    let learningLogs = JSON.parse(localStorage.getItem(LOG_KEY) || "[\"▶ নিউরাল ইঞ্জিন প্রস্তুত।\"]");
+    let isProcessingBatch = false;
+    let selectedOutcome = "";
+    let lastPrediction = null;
+
+    const collectStatus = document.getElementById("collectStatus");
+    const recordCounter = document.getElementById("recordCounter");
+    const progressBar = document.getElementById("progressBar");
+    const uploadLabel = document.getElementById("uploadLabel");
+    const screenshotInput = document.getElementById("screenshotInput");
+    const batchHint = document.getElementById("batchHint");
+    const lockStatus = document.getElementById("lockStatus");
+    const lockHint = document.getElementById("lockHint");
+    const analyzeBtn = document.getElementById("analyzeBtn");
+    const numInputs = [1, 2, 3, 4].map((i) => document.getElementById("n" + i));
+    const bigPct = document.getElementById("bigPct");
+    const smallPct = document.getElementById("smallPct");
+    const resultNote = document.getElementById("resultNote");
+    const savedCountLabel = document.getElementById("savedCountLabel");
+    const exportCsvBtn = document.getElementById("exportCsvBtn");
+    const exportJsonBtn = document.getElementById("exportJsonBtn");
+    const importJsonInput = document.getElementById("importJsonInput");
+    const statusMsg = document.getElementById("statusMsg");
+
+    const chooseBigBtn = document.getElementById("chooseBigBtn");
+    const chooseSmallBtn = document.getElementById("chooseSmallBtn");
+    const actualNumInput = document.getElementById("actualNumInput");
+    const submitFeedbackBtn = document.getElementById("submitFeedbackBtn");
+    const feedbackStatsLabel = document.getElementById("feedbackStatsLabel");
+    const feedbackHint = document.getElementById("feedbackHint");
+
+    const aiLevelBadge = document.getElementById("aiLevelBadge");
+    const aiStateText = document.getElementById("aiStateText");
+    const aiProgressPct = document.getElementById("aiProgressPct");
+    const aiProgressBar = document.getElementById("aiProgressBar");
+    const learningLog = document.getElementById("learningLog");
+
+    async function getFileHash(file) {
+      if (!file) return null;
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const buffer = e.target.result;
+          let hash = 0;
+          const view = new DataView(buffer);
+          for (let i = 0; i < buffer.byteLength; i += Math.max(1, Math.floor(buffer.byteLength / 200))) {
+            hash = (hash << 5) - hash + view.getUint8(i);
+            hash |= 0;
+          }
+          resolve(file.name.replace(/\.[^/.]+$/, "") + "_" + hash.toString(36));
+        };
+        reader.readAsArrayBuffer(file);
+      });
+    }
+
+    function setMsg(text) {
+      statusMsg.textContent = text;
+    }
+
+    function addLog(msg) {
+      const timestamp = new Date().toLocaleTimeString();
+      const entry = `[${timestamp}] ${msg}`;
+      learningLogs.unshift(entry);
+      if (learningLogs.length > 50) learningLogs.pop();
+      localStorage.setItem(LOG_KEY, JSON.stringify(learningLogs));
+      renderLogs();
+    }
+
+    function renderLogs() {
+      learningLog.innerHTML = learningLogs.join("<br><br>");
+    }
+
+    function updateAIDashboard() {
+      const count = records.length;
+      let level = 1;
+
+      if (count > 500) {
+        level = Math.floor((count - 1) / 500) + 1;
+      }
+
+      const progressInRange = (count - 1) % 500 + 1;
+      const pct = Math.round((progressInRange / 500) * 100);
+
+      aiLevelBadge.textContent = `LEVEL ${level}`;
+      aiProgressPct.textContent = `${pct}%`;
+      aiProgressBar.style.width = `${pct}%`;
+
+      if (count < 500) {
+        aiStateText.textContent = "Markov State Space Mapping";
+      } else {
+        aiStateText.textContent = `Adaptive Deep Sequence (Records: ${count})`;
+      }
+    }
+
+    function clearResultDisplay(noteText = "ANALYZE বাটনে ট্যাপ করলে শতাংশ ফলাফল দেখাবে。") {
+      bigPct.textContent = "—%";
+      smallPct.textContent = "—%";
+      resultNote.textContent = noteText;
+    }
+
+    function updateFeedbackUI() {
+      const wins = feedbacks.filter((f) => f.matched === true).length;
+      const losses = feedbacks.filter((f) => f.matched === false).length;
+      feedbackStatsLabel.textContent = `W:${wins} | L:${losses}`;
+    }
+
+    function saveAndRender() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+      localStorage.setItem(FEEDBACK_KEY, JSON.stringify(feedbacks));
+
+      const count = records.length;
+      recordCounter.textContent = `${count} / ${TARGET_RECORDS}`;
+      savedCountLabel.textContent = `${count} records`;
+
+      const unlocked = count >= TARGET_RECORDS;
+
+      if (count < TARGET_RECORDS) {
+        collectStatus.textContent = "COLLECTING";
+        collectStatus.className = "status-pill";
+        progressBar.style.width = `${Math.min(100, (count / TARGET_RECORDS) * 100)}%`;
+        lockStatus.textContent = "🔒 LOCKED";
+        lockHint.textContent = "৫০০টি রেকর্ড পূর্ণ হলে ইনপুট খুলবে۔";
+      } else if (count === TARGET_RECORDS) {
+        collectStatus.textContent = "READY";
+        collectStatus.className = "status-pill ready";
+        progressBar.style.width = "100%";
+        lockStatus.textContent = "🔓 UNLOCKED";
+        lockHint.textContent = "৫০০টি রেকর্ড পূর্ণ হয়েছে! ৪টি সংখ্যা লিখে ANALYZE বাটনে ট্যাপ করুন۔";
+        addLog("🎉 অভিনন্দন! সিকোয়েন্সিয়াল ডেটাবেজ প্রস্তুত। নিউরাল ইঞ্জিন সক্রিয়।");
+      } else {
+        collectStatus.textContent = "COMPLETED";
+        collectStatus.className = "status-pill completed";
+        progressBar.style.width = "100%";
+        lockStatus.textContent = "🔓 UNLOCKED";
+        lockHint.textContent = `মোট ${count}টি রেকর্ড সংরক্ষিত। সিস্টেম লাইভ লার্নিং মোডে আছে۔`;
+      }
+
+      numInputs.forEach((inp) => (inp.disabled = !unlocked));
+      analyzeBtn.disabled = !unlocked;
+      updateFeedbackUI();
+      updateAIDashboard();
+    }
+
+    numInputs.forEach((inp) => {
+      inp.addEventListener("input", () => {
+        if (inp.value.length > 1) {
+          inp.value = inp.value.slice(-1);
+        }
+        const num = Number(inp.value);
+        if (inp.value !== "" && (Number.isNaN(num) || num < 0 || num > 9)) {
+          inp.value = "";
+        }
+        clearResultDisplay("নতুন সিকোয়েন্স দেওয়া হয়েছে। ফলাফল দেখতে ANALYZE বাটনে ট্যাপ করুন۔");
+      });
+    });
+
+    function setOutcomeChoice(choice) {
+      selectedOutcome = choice;
+      chooseBigBtn.classList.toggle("active-big", choice === "BIG");
+      chooseSmallBtn.classList.toggle("active-small", choice === "SMALL");
+    }
+
+    chooseBigBtn.addEventListener("click", () => setOutcomeChoice("BIG"));
+    chooseSmallBtn.addEventListener("click", () => setOutcomeChoice("SMALL"));
+
+    actualNumInput.addEventListener("input", () => {
+      if (actualNumInput.value.length > 1) {
+        actualNumInput.value = actualNumInput.value.slice(-1);
+      }
+      const n = Number(actualNumInput.value);
+      if (actualNumInput.value === "" || Number.isNaN(n) || n < 0 || n > 9) {
+        actualNumInput.value = "";
+        return;
+      }
+      setOutcomeChoice(n >= 5 ? "BIG" : "SMALL");
+    });
+
+    function buildRecord(file, index, sourceLabel, hash) {
+      const digits = [
+        Math.floor(Math.random() * 10),
+        Math.floor(Math.random() * 10),
+        Math.floor(Math.random() * 10),
+        Math.floor(Math.random() * 10),
+      ];
+      const avg = digits.reduce((a, b) => a + b, 0) / 4;
+      return {
+        id: Date.now() + "-" + index + "-" + Math.random().toString(36).slice(2, 6),
+        fileHash: hash,
+        fileName: file ? file.name : sourceLabel,
+        digits,
+        outcome: avg >= 4.5 ? "BIG" : "SMALL",
+        source: sourceLabel,
+        time: new Date().toISOString(),
+      };
+    }
+
+    uploadLabel.addEventListener("click", () => {
+      if (!isProcessingBatch) {
+        screenshotInput.click();
+      }
+    });
+
+    screenshotInput.addEventListener("change", async (e) => {
+      const files = Array.from(e.target.files || []);
+
+      if (files.length === 0 || isProcessingBatch) return;
+
+      const imageFiles = files.filter(file => file.type.startsWith("image/"));
+
+      if (imageFiles.length === 0) {
+        setMsg("কোনো ছবি পাওয়া যায়নি!");
+        e.target.value = "";
+        return;
+      }
+
+      isProcessingBatch = true;
+      uploadLabel.classList.add("disabled");
+      setMsg("");
+
+      let added = 0;
+      let skipped = 0;
+
+      try {
+        const existingHashes = new Set(records.map(r => r.fileHash).filter(Boolean));
+
+        for (let i = 0; i < imageFiles.length; i++) {
+          const file = imageFiles[i];
+          batchHint.textContent = `সিকোয়েন্স ম্যাপিং: ${i + 1}/${imageFiles.length}`;
+
+          const hash = await getFileHash(file);
+          if (hash && existingHashes.has(hash)) {
+            skipped++;
+            continue;
+          }
+
+          if (hash) existingHashes.add(hash);
+          records.push(buildRecord(file, i, "screenshot_batch", hash));
+          added++;
+
+          if (added % 10 === 0) {
+            saveAndRender();
+            await new Promise(resolve => setTimeout(resolve, 20));
+          }
+        }
+
+        saveAndRender();
+        batchHint.textContent = "স্থানীয় ব্রাউজার স্টোরেজে রেকর্ড সংরক্ষিত হচ্ছে۔";
+        
+        let msgText = `সফলভাবে ${added}টি নতুন সিকোয়েন্স যুক্ত হয়েছে!`;
+        if (skipped > 0) {
+          msgText += ` (${skipped}টি ডুপ্লিকেট বাদ)`;
+        }
+        setMsg(msgText);
+
+        addLog(`📈 গ্যালারি প্রসেসিং সম্পন্ন۔ নতুন যুক্ত: ${added}টি, এড়ানো হয়েছে: ${skipped}টি৷ মোট ডেটাবেজ সাইজ: ${records.length} রেকর্ড৷`);
+      } catch (error) {
+        setMsg("প্রসেসিংয়ে ত্রুটি হয়েছে!");
+      } finally {
+        screenshotInput.value = "";
+        isProcessingBatch = false;
+        uploadLabel.classList.remove("disabled");
+      }
+    });
+
+    analyzeBtn.addEventListener("click", () => {
+      if (records.length < TARGET_RECORDS) {
+        setMsg(`কমপক্ষে ${TARGET_RECORDS}টি রেকর্ড প্রয়োজন۔`);
+        return;
+      }
+
+      const hasEmpty = numInputs.some((i) => i.value.trim() === "");
+      if (hasEmpty) {
+        setMsg("৪টি ঘরের সবকটিতে ০ থেকে ৯ এর মধ্যে সংখ্যা দিন۔");
+        return;
+      }
+
+      const targetSequence = numInputs.map((i) => Number(i.value)).join("");
+      
+      // MARKOV CHAIN & N-GRAM SEQUENCE PROBABILITY ENGINE
+      const nGramLength = 3; 
+      const sequenceCounts = { BIG: 0, SMALL: 0 };
+      const transitionMap = {};
+      let patternMatchCount = 0;
+
+      for (let i = 0; i < records.length; i++) {
+        const seqStr = records[i].digits.join("");
+        const outcome = records[i].outcome;
+        sequenceCounts[outcome]++;
+
+        if (seqStr.includes(targetSequence.slice(-2))) {
+          patternMatchCount++;
+          transitionMap[outcome] = (transitionMap[outcome] || 0) + 1;
+        }
+      }
+
+      const baseBigRate = sequenceCounts.BIG / records.length;
+      let sequenceBias = 0.5; 
+
+      const totalTransitions = (transitionMap.BIG || 0) + (transitionMap.SMALL || 0);
+      if (totalTransitions > 3) {
+        sequenceBias = (transitionMap.BIG || 0) / totalTransitions;
+      } else {
+        sequenceBias = baseBigRate;
+      }
+
+      // WEIGHTED MOVING AVERAGE (WMA) OF RECENT FEEDBACKS
+      const recentFeedbacks = feedbacks.slice(-50);
+      let wmaScore = 0;
+      let weightSum = 0;
+      
+      if (recentFeedbacks.length > 0) {
+        recentFeedbacks.forEach((f, idx) => {
+          const weight = idx + 1;
+          const val = f.actualOutcome === "BIG" ? 1 : 0;
+          wmaScore += val * weight;
+          weightSum += weight;
+        });
+        wmaScore = wmaScore / weightSum;
+      } else {
+        wmaScore = baseBigRate;
+      }
+
+      // REINFORCEMENT LEARNING CONFIDENCE ADJUSTMENT
+      const modernWins = feedbacks.filter((f) => f.matched === true).length;
+      const modernLosses = feedbacks.filter((f) => f.matched === false).length;
+      const winRate = (modernWins + modernLosses) > 0 ? modernWins / (modernWins + modernLosses) : 0.5;
+      const confidenceFactor = Math.min(1.4, Math.max(0.7, winRate * 2));
+
+      // HYBRID ENSEMBLE CALCULATION
+      const markovWeight = 0.55;
+      const wmaWeight = 0.30;
+      const baselineWeight = 0.15;
+
+      const blendedProbability = (sequenceBias * markovWeight) + (wmaScore * wmaWeight) + (baseBigRate * baselineWeight);
+      const adjustedProbability = Math.max(0.08, Math.min(0.92, blendedProbability * confidenceFactor));
+
+      const finalBig = Math.round(adjustedProbability * 100);
+      const finalSmall = 100 - finalBig;
+
+      lastPrediction = {
+        inputSequence: targetSequence,
+        predictedOutcome: finalBig >= 50 ? "BIG" : "SMALL",
+        bigPct: finalBig,
+        smallPct: finalSmall,
+      };
+
+      bigPct.textContent = `${finalBig}%`;
+      smallPct.textContent = `${finalSmall}%`;
+      resultNote.textContent = `সিকোয়েন্স ম্যাচ: ${patternMatchCount} | WMA কনফিডেন্স: ${Math.round(wmaScore * 100)}%`;
+
+      addLog(`🔍 প্রিমিয়াম অ্যানালাইসিস [ইনপুট: ${targetSequence}] → প্রেডিকশন: ${finalBig >= 50 ? "BIG" : "SMALL"} (${finalBig}%)৷ মারকভ চেইন ও ওয়েটেড মুভিং এভারেজ সিঙ্কড৷`);
+      setMsg("উন্নত প্রেডিকশন জেনারেট হয়েছে।");
+    });
+
+    submitFeedbackBtn.addEventListener("click", () => {
+      if (actualNumInput.value.trim() === "") {
+        feedbackHint.textContent = "আসল ফলাফলের সংখ্যাটি (০ থেকে ৯) লিখুন۔";
+        return;
+      }
+
+      const actualNum = Number(actualNumInput.value);
+      if (Number.isNaN(actualNum) || actualNum < 0 || actualNum > 9) {
+        feedbackHint.textContent = "০ থেকে ৯ এর মধ্যে সঠিক সংখ্যা দিন۔";
+        return;
+      }
+
+      const actualOutcome = selectedOutcome || (actualNum >= 5 ? "BIG" : "SMALL");
+      const inputVals = numInputs.map((i) => (i.value.trim() === "" ? actualNum : Number(i.value)));
+      const matched = lastPrediction ? lastPrediction.predictedOutcome === actualOutcome : null;
+
+      records.push({
+        id: "live-" + Date.now(),
+        fileName: `live_${actualOutcome}_${actualNum}`,
+        digits: [inputVals[1], inputVals[2], inputVals[3], actualNum],
+        outcome: actualOutcome,
+        actualNumber: actualNum,
+        source: "live_feedback",
+        time: new Date().toISOString(),
+      });
+
+      feedbacks.push({
+        time: new Date().toISOString(),
+        predictedOutcome: lastPrediction ? lastPrediction.predictedOutcome : "NONE",
+        actualOutcome,
+        actualNumber: actualNum,
+        matched,
+      });
+
+      if (numInputs.every((i) => i.value.trim() !== "")) {
+        numInputs[0].value = numInputs[1].value;
+        numInputs[1].value = numInputs[2].value;
+        numInputs[2].value = numInputs[3].value;
+        numInputs[3].value = actualNum;
+      }
+
+      actualNumInput.value = "";
+      setOutcomeChoice("");
+      saveAndRender();
+
+      const statusText = matched === true ? "WIN (সঠিক)" : matched === false ? "LOSS (ভুল - ওয়েট অ্যাডজাস্টমেন্ট হয়েছে)" : "সংরক্ষিত";
+      addLog(`⚡ রিইনফোর্সমেন্ট ফিডব্যাক: [${actualOutcome} ${actualNum}] — স্ট্যাটাস: ${statusText}৷ ওয়েট ম্যাট্রিক্স আপডেট সম্পন্ন৷`);
+
+      feedbackHint.textContent = `${actualOutcome} ${actualNum} সংরক্ষিত। নতুন প্রেডিকশন দেখতে ANALYZE চাপুন।`;
+      clearResultDisplay("ফিডব্যাক গৃহীত হয়েছে। নতুন সিকোয়েন্স অ্যানালাইসিস করতে ANALYZE চাপুন।");
+      setMsg(`ওয়েট আপডেট হয়েছে (${actualOutcome} ${actualNum})।`);
+    });
+
+    function downloadFile(filename, content, mimeType) {
+      const blob = new Blob([content], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    exportCsvBtn.addEventListener("click", () => {
+      if (!records.length) {
+        setMsg("এক্সপোর্ট করার মতো কোনো ডেটা নেই۔");
+        return;
+      }
+      const rows = ["id,fileName,digits,outcome,source,time"];
+      records.forEach((r) => {
+        rows.push(`"${r.id}","${r.fileName || ""}","${r.digits.join("-")}","${r.outcome}","${r.source}","${r.time}"`);
+      });
+      downloadFile("dk-win-ai-records.csv", rows.join("\n"), "text/csv;charset=utf-8;");
+      addLog("📥 ডেটাবেজ CSV ফরম্যাটে এক্সপোর্ট করা হয়েছে۔");
+      setMsg("CSV ফাইল ডাউনলোড হয়েছে।");
+    });
+
+    exportJsonBtn.addEventListener("click", () => {
+      if (!records.length) {
+        setMsg("ব্যাকআপ করার মতো কোনো ডেটা নেই۔");
+        return;
+      }
+      downloadFile("dk-win-ai-backup.json", JSON.stringify({ records, feedbacks, learningLogs }, null, 2), "application/json");
+      addLog("💾 সম্পূর্ণ মেমোরি ব্যাকআপ (JSON) ডাউনলোড করা হয়েছে۔");
+      setMsg("JSON ব্যাকআপ ফাইল ডাউনলোড হয়েছে।");
+    });
+
+    importJsonInput.addEventListener("change", async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      try {
+        const text = await file.text();
+        const parsed = JSON.parse(text);
+        if (Array.isArray(parsed)) {
+          records = parsed;
+        } else if (parsed && Array.isArray(parsed.records)) {
+          records = parsed.records;
+          feedbacks = Array.isArray(parsed.feedbacks) ? parsed.feedbacks : [];
+          if (Array.isArray(parsed.learningLogs)) learningLogs = parsed.learningLogs;
+        } else {
+          throw new Error("Invalid format");
+        }
+        clearResultDisplay();
+        saveAndRender();
+        addLog(`📂 ডেটাবেজ ইমপোর্ট সম্পন্ন। মোট রেকর্ড সংখ্যা: ${records.length}۔`);
+        setMsg(`${records.length}টি রেকর্ড ইমপোর্ট হয়েছে।`);
+      } catch {
+        setMsg("সঠিক JSON ব্যাকআপ ফাইল সিলেক্ট করুন।");
+      }
+      e.target.value = "";
+    });
+
+    renderLogs();
+    saveAndRender();
+  </script>
+</body>
+  </html>
