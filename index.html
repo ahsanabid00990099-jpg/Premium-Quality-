@@ -1,1881 +1,248 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DK WIN AI - Premium Sequence Analysis</title>
-  <style>
-    :root {
-      --bg: #070b14;
-      --card: #0f172a;
-      --card-2: #131f38;
-      --border: #1e293b;
-      --text: #f8fafc;
-      --muted: #94a3b8;
-      --accent: #38bdf8;
-      --green: #14532d;
-      --green-border: #22c55e;
-      --red: #450a0a;
-      --red-border: #ef4444;
-      --purple: #581c87;
-      --purple-border: #c084fc;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      padding: 16px;
-      display: flex;
-      justify-content: center;
-    }
-
-    .app {
-      width: 100%;
-      max-width: 460px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 14px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-    }
-
-    .brand h1 {
-      font-size: 18px;
-      letter-spacing: 0.5px;
-    }
-
-    .brand p {
-      font-size: 11px;
-      color: var(--muted);
-      margin-top: 2px;
-    }
-
-    .badge {
-      background: rgba(56, 189, 248, 0.15);
-      color: var(--accent);
-      border: 1px solid rgba(56, 189, 248, 0.35);
-      padding: 5px 9px;
-      border-radius: 8px;
-      font-size: 11px;
-      font-weight: 700;
-    }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .card-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    .status-pill {
-      padding: 3px 8px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 700;
-      background: rgba(245, 158, 11, 0.15);
-      color: #fbbf24;
-    }
-
-    .status-pill.ready {
-      background: rgba(34, 197, 94, 0.15);
-      color: #4ade80;
-    }
-
-    .status-pill.completed {
-      background: rgba(168, 85, 247, 0.15);
-      color: #c084fc;
-    }
-
-    .counter {
-      font-size: 28px;
-      font-weight: 800;
-      text-align: center;
-      color: var(--accent);
-    }
-
-    .progress-wrap {
-      width: 100%;
-      height: 8px;
-      background: #1e293b;
-      border-radius: 999px;
-      overflow: hidden;
-    }
-
-    .progress-bar {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #0284c7, #38bdf8);
-      transition: width 0.25s ease;
-    }
-
-    .btn {
-      width: 100%;
-      padding: 12px 14px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--card-2);
-      color: var(--text);
-      font-weight: 700;
-      font-size: 14px;
-      cursor: pointer;
-    }
-
-    .btn-primary {
-      background: #0284c7;
-      border-color: #0ea5e9;
-      color: #fff;
-    }
-
-    .btn:disabled,
-    .btn.disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-      pointer-events: none;
-    }
-
-    .hint {
-      font-size: 12px;
-      color: var(--muted);
-      text-align: center;
-      line-height: 1.45;
-    }
-
-    .inputs {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-    }
-
-    .inputs input {
-      width: 100%;
-      text-align: center;
-      font-size: 18px;
-      font-weight: 700;
-      padding: 10px;
-      border-radius: 10px;
-      border: 1px solid #334155;
-      background: #090e1a;
-      color: var(--text);
-    }
-
-    .results {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .box {
-      padding: 14px;
-      border-radius: 12px;
-      text-align: center;
-      border: 1px solid transparent;
-    }
-
-    .box.big {
-      background: var(--green);
-      border-color: var(--green-border);
-    }
-
-    .box.small {
-      background: var(--red);
-      border-color: var(--red-border);
-    }
-
-    .box .label {
-      font-size: 12px;
-      font-weight: 700;
-      opacity: 0.9;
-    }
-
-    .box .pct {
-      font-size: 24px;
-      font-weight: 800;
-      margin-top: 4px;
-    }
-
-    .backup-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-    }
-
-    .feedback-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr 95px;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .choice-btn {
-      padding: 11px 8px;
-      border-radius: 10px;
-      border: 1px solid #334155;
-      background: #090e1a;
-      color: var(--muted);
-      font-weight: 800;
-      font-size: 13px;
-      cursor: pointer;
-    }
-
-    .choice-btn.active-big {
-      background: var(--green);
-      border-color: var(--green-border);
-      color: #fff;
-    }
-
-    .choice-btn.active-small {
-      background: var(--red);
-      border-color: var(--red-border);
-      color: #fff;
-    }
-
-    .feedback-num {
-      width: 100%;
-      text-align: center;
-      font-size: 16px;
-      font-weight: 700;
-      padding: 10px 8px;
-      border-radius: 10px;
-      border: 1px solid #334155;
-      background: #090e1a;
-      color: var(--text);
-    }
-
-    .ai-dashboard {
-      background: rgba(88, 28, 135, 0.15);
-      border: 1px solid var(--purple-border);
-      border-radius: 12px;
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .ai-meta {
-      display: flex;
-      justify-content: space-between;
-      font-size: 13px;
-      font-weight: 700;
-      color: #c084fc;
-    }
-
-    .level-bar-wrap {
-      width: 100%;
-      height: 10px;
-      background: #3b0764;
-      border-radius: 999px;
-      overflow: hidden;
-    }
-
-    .level-bar {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #9333ea, #c084fc);
-      transition: width 0.3s ease;
-    }
-
-    .learning-log {
-      font-size: 12px;
-      color: #e9d5ff;
-      background: rgba(0, 0, 0, 0.4);
-      padding: 10px;
-      border-radius: 8px;
-      max-height: 120px;
-      overflow-y: auto;
-      line-height: 1.4;
-      border-left: 3px solid var(--purple-border);
-    }
-
-    .msg {
-      font-size: 12px;
-      color: #38bdf8;
-      text-align: center;
-      min-height: 18px;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#090b18">
+<title>DK WIN AI — Master Intelligence</title>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<style>
+:root{--bg:#090b18;--panel:#11152a;--panel2:#171c35;--line:#292f50;--text:#f3f5ff;--muted:#9aa3c7;--cyan:#36d9f5;--purple:#a879ff;--green:#26d99a;--red:#ff6687;--gold:#ffc86b}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% 0%,#1b1640 0,transparent 34%),var(--bg);color:var(--text);font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+button,input,select{font:inherit}button{cursor:pointer}.shell{display:flex;min-height:100vh}.sidebar{width:248px;background:#0d1022;border-right:1px solid var(--line);padding:22px 14px;flex-shrink:0}.brand{display:flex;gap:11px;align-items:center;padding:4px 8px 24px}.logo{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,var(--cyan),var(--purple));display:grid;place-items:center;color:#080b18;font-weight:1000;font-size:20px;box-shadow:0 0 24px #36d9f544}.brand strong{font-size:17px;letter-spacing:.5px}.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:1.3px}.nav{display:grid;gap:7px}.nav button{border:1px solid transparent;background:transparent;color:var(--muted);text-align:left;padding:12px 13px;border-radius:11px;font-weight:700}.nav button.active,.nav button:hover{background:#1a2040;border-color:#343b68;color:var(--cyan)}.side-note{margin:26px 7px 0;padding:13px;border:1px solid var(--line);border-radius:12px;color:var(--muted);font-size:11px}.main{min-width:0;flex:1;padding:25px clamp(14px,3vw,38px) 50px;max-width:1500px;margin:auto}.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px}.topbar h1{font-size:23px;margin:0}.topbar p{margin:3px 0 0;color:var(--muted);font-size:12px}.top-actions{display:flex;gap:8px;align-items:center}.status{border:1px solid #285d61;color:var(--green);background:#12312f;padding:7px 11px;border-radius:99px;font-size:11px;font-weight:800}.menu{display:none}.page{display:none}.page.active{display:block}.grid{display:grid;gap:15px}.stats{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:15px}.stat,.card{background:linear-gradient(145deg,#141932,#101427);border:1px solid var(--line);border-radius:16px;padding:17px;box-shadow:0 8px 28px #0002}.stat label{color:var(--muted);font-size:11px}.stat strong{display:block;font-size:25px;margin-top:6px}.stat em{font-style:normal;color:var(--cyan);font-size:11px}.two{grid-template-columns:1.25fr .75fr}.card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}.card h2,.card h3{margin:0;font-size:15px}.sub{color:var(--muted);font-size:11px}.badge{font-size:10px;color:var(--cyan);background:#153247;padding:5px 8px;border-radius:7px;font-weight:800}.btn{border:1px solid #394267;background:#202746;color:var(--text);padding:10px 13px;border-radius:10px;font-weight:750}.btn:hover{filter:brightness(1.15)}.btn.primary{background:linear-gradient(110deg,#147f9c,#6251bd);border-color:#4d9cb8}.btn.good{background:#124936;border-color:#237e5d}.btn.danger{background:#4a2032;border-color:#87415c}.btn:disabled{opacity:.45;cursor:not-allowed}.actions{display:flex;flex-wrap:wrap;gap:8px}.drop{border:1px dashed #4a5680;background:#0d1328;border-radius:13px;padding:24px;text-align:center;color:var(--muted)}.drop strong{display:block;color:var(--text);margin-bottom:5px}.progress{height:8px;border-radius:20px;background:#272d4c;overflow:hidden;margin:12px 0}.progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--purple));transition:width .2s}.muted{color:var(--muted)}.small{font-size:11px}.digits{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.digits input,.feedback-input,.field{width:100%;background:#0a0f21;border:1px solid #343d63;color:var(--text);border-radius:10px;padding:12px;text-align:center;font-size:20px;font-weight:800;outline:none}.digits input:focus,.field:focus{border-color:var(--cyan)}.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.result{border:1px solid;border-radius:13px;padding:15px;text-align:center}.result.big{background:#10372f;border-color:#1d916c}.result.small{background:#421f32;border-color:#a34867}.result strong{display:block;font-size:30px}.result span{font-size:12px;font-weight:900;letter-spacing:1px}.meter{height:8px;background:#282e4d;border-radius:20px;overflow:hidden;margin-top:9px}.meter i{display:block;height:100%;background:var(--green)}.engine-list{display:grid;gap:10px}.engine{display:grid;grid-template-columns:125px 1fr 48px;gap:9px;align-items:center;font-size:11px}.engine .meter{margin:0}.engine .meter i{background:linear-gradient(90deg,var(--purple),var(--cyan))}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;font-size:12px;white-space:nowrap}th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line)}th{color:var(--muted);font-weight:700}.pill{display:inline-block;padding:3px 7px;border-radius:7px;font-size:10px;font-weight:800}.pill.big{background:#164b3b;color:#6df0bd}.pill.small{background:#51253a;color:#ff9ab1}.pill.demo{background:#433516;color:#ffd27b}.notice{padding:11px 13px;background:#191d37;border:1px solid var(--line);border-radius:10px;color:var(--muted);font-size:11px;margin-top:12px}.notice.warn{border-color:#795d32;background:#302817;color:#ffda91}.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field{text-align:left;font-size:14px;font-weight:500}.log{max-height:260px;overflow:auto;display:grid;gap:8px}.log-item{background:#0c1225;border:1px solid var(--line);border-radius:9px;padding:9px 11px;color:#cbd2ef;font-size:11px}.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#202746;border:1px solid #48547e;padding:10px 16px;border-radius:10px;display:none;z-index:20;max-width:90%;text-align:center}.toast.show{display:block}.footer{color:#7882a9;font-size:10px;text-align:center;margin-top:22px}.hidden{display:none!important}
+@media(max-width:900px){.sidebar{width:210px}.stats{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}}
+@media(max-width:680px){.shell{display:block}.sidebar{position:fixed;z-index:15;top:0;bottom:0;left:-260px;width:245px;transition:left .2s;box-shadow:15px 0 35px #0008}.sidebar.open{left:0}.menu{display:inline-flex}.main{padding:17px 12px 38px}.topbar h1{font-size:19px}.topbar{align-items:flex-start}.stats{gap:9px}.stat{padding:13px}.stat strong{font-size:21px}.engine{grid-template-columns:100px 1fr 40px}.form-row{grid-template-columns:1fr}.drop{padding:18px 10px}}
+</style>
 </head>
 <body>
-  <div class="app">
-    <div class="header">
-      <div class="brand">
-        <h1>DK WIN AI</h1>
-        <p>PREMIUM SEQUENCE ANALYSIS</p>
-      </div>
-      <div class="badge">WIN GO 1 MINUTE</div>
-    </div>
+<div class="shell">
+<aside class="sidebar" id="sidebar">
+ <div class="brand"><div class="logo">DK</div><div><strong>DK WIN AI</strong><small>MASTER INTELLIGENCE</small></div></div>
+ <nav class="nav" id="nav">
+  <button class="active" data-page="dashboard">◈ Dashboard</button><button data-page="analysis">⌁ Analysis</button><button data-page="prediction">✦ Prediction</button><button data-page="history">▤ History</button><button data-page="settings">⚙ Settings</button><button data-page="help">? Help & Guide</button>
+ </nav>
+ <div class="side-note">আপনার ডেটা এই ডিভাইসের ব্রাউজারে থাকে। নিয়মিত JSON ব্যাকআপ রাখুন।</div>
+</aside>
+<main class="main">
+<header class="topbar"><div style="display:flex;gap:10px;align-items:center"><button class="btn menu" id="menuBtn">☰</button><div><h1 id="pageTitle">Dashboard</h1><p>Sequence analytics • local data workspace</p></div></div><div class="top-actions"><span class="status">● SYSTEM READY</span></div></header>
 
-    <!-- AI Live Intelligence Dashboard -->
-    <div class="card ai-dashboard">
-      <div class="card-top">
-        <span>ADVANCED NEURAL ENGINE</span>
-        <span id="aiLevelBadge" class="status-pill">LEVEL 1</span>
-      </div>
-      <div class="ai-meta">
-        <span id="aiStateText">Model Training Initialized</span>
-        <span id="aiProgressPct">0%</span>
-      </div>
-      <div class="level-bar-wrap">
-        <div class="level-bar" id="aiProgressBar"></div>
-      </div>
-      <div class="learning-log" id="learningLog">
-        ▶ সিস্টেম প্রস্তুত হচ্ছে... স্ক্রিনশট আপলোড করে ট্রেনিং শুরু করুন।
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-top">
-        <span>SCREENSHOT COLLECTION</span>
-        <span class="status-pill" id="collectStatus">COLLECTING</span>
-      </div>
-
-      <div class="counter" id="recordCounter">0 / 500</div>
-      <div class="progress-wrap">
-        <div class="progress-bar" id="progressBar"></div>
-      </div>
-
-      <label class="btn btn-primary" id="uploadLabel" style="text-align:center;">
-        📸 একসাথে অনেকগুলো স্ক্রিনশট সিলেক্ট করুন
-      </label>
-
-      <input
-        type="file"
-        id="screenshotInput"
-        accept="image/*"
-        multiple
-        style="display:none;"
-      />
-
-      <p class="hint" id="batchHint">
-        স্থানীয় ব্রাউজার স্টোরেজে রেকর্ড সংরক্ষিত হচ্ছে। ডুপ্লিকেট অটো-ফিল্টার সক্রিয়।
-      </p>
-    </div>
-
-    <div class="card">
-      <div class="card-top">
-        <span>FOUR NUMBER INPUT</span>
-        <span class="status-pill" id="lockStatus">🔒 LOCKED</span>
-      </div>
-
-      <div class="inputs">
-        <input type="number" min="0" max="9" id="n1" placeholder="0" disabled />
-        <input type="number" min="0" max="9" id="n2" placeholder="0" disabled />
-        <input type="number" min="0" max="9" id="n3" placeholder="0" disabled />
-        <input type="number" min="0" max="9" id="n4" placeholder="0" disabled />
-      </div>
-
-      <button type="button" class="btn btn-primary" id="analyzeBtn" disabled>ANALYZE SEQUENCE</button>
-      <p class="hint" id="lockHint">৫০০টি রেকর্ড পূর্ণ হলে ইনপুট খুলবে。</p>
-    </div>
-
-    <div class="card">
-      <div class="card-top">
-        <span>PREMIUM AI PREDICTION</span>
-        <span>PROBABILITY STATS</span>
-      </div>
-
-      <div class="results">
-        <div class="box big">
-          <div class="label">BIG</div>
-          <div class="pct" id="bigPct">—%</div>
-        </div>
-        <div class="box small">
-          <div class="label">SMALL</div>
-          <div class="pct" id="smallPct">—%</div>
-        </div>
-      </div>
-
-      <p class="hint" id="resultNote">ANALYZE বাটনে ট্যাপ করলে মারকভ চেইন ও ওয়েটেড মুভিং এভারেজ ফলাফল দেখাবে।</p>
-    </div>
-
-    <div class="card">
-      <div class="card-top">
-        <span>DATA BACKUP</span>
-        <span id="savedCountLabel">0 records</span>
-      </div>
-
-      <div class="backup-grid">
-        <button class="btn btn-sm" id="exportCsvBtn">CSV EXPORT</button>
-        <button class="btn btn-sm" id="exportJsonBtn">JSON BACKUP</button>
-        <label class="btn btn-sm" style="text-align:center;">
-          IMPORT
-          <input type="file" id="importJsonInput" accept=".json,application/json" hidden />
-        </label>
-      </div>
-
-      <div class="msg" id="statusMsg"></div>
-    </div>
-
-    <div class="card">
-      <div class="card-top">
-        <span>ACTUAL RESULT FEEDBACK</span>
-        <span id="feedbackStatsLabel">0 feedback</span>
-      </div>
-
-      <div class="feedback-row">
-        <button type="button" class="choice-btn" id="chooseBigBtn">BIG (5-9)</button>
-        <button type="button" class="choice-btn" id="chooseSmallBtn">SMALL (0-4)</button>
-        <input
-          type="number"
-          min="0"
-          max="9"
-          id="actualNumInput"
-          class="feedback-num"
-          placeholder="সংখ্যা"
-        />
-      </div>
-
-      <button type="button" class="btn btn-primary" id="submitFeedbackBtn">
-        ফলাফল জমা দিন ও ওয়েট আপডেট করুন
-      </button>
-
-      <p class="hint" id="feedbackHint">
-        ফিডব্যাক দিলে রিইনফোর্সমেন্ট লার্নিং অ্যালগরিদম প্রেডিকশন সূক্ষ্মতর করবে।
-      </p>
-    </div>
+<section class="page active" id="page-dashboard">
+ <div class="grid stats">
+  <div class="stat"><label>মোট রেকর্ড</label><strong id="statRecords">0</strong><em>সংরক্ষিত ডেটা</em></div>
+  <div class="stat"><label>ফিডব্যাক</label><strong id="statFeedback">0</strong><em>পরীক্ষিত ফলাফল</em></div>
+  <div class="stat"><label>ম্যাচ রেট</label><strong id="statAccuracy">—</strong><em>শুধু যাচাইকৃত প্রেডিকশন</em></div>
+  <div class="stat"><label>সর্বশেষ আপডেট</label><strong id="statUpdated" style="font-size:15px">—</strong><em>লোকাল ডেটাবেস</em></div>
+ </div>
+ <div class="grid two">
+  <div class="card">
+   <div class="card-head"><h2>Screenshot Collector</h2><span class="badge" id="recordBadge">0 RECORDS</span></div>
+   <div class="drop"><strong>📷 স্ক্রিনশট নির্বাচন করুন</strong><div>OCR দিয়ে চার অঙ্কের ফলাফল পড়ার চেষ্টা করবে</div><div class="actions" style="justify-content:center;margin-top:13px"><label class="btn primary" for="screenshots">ছবি আপলোড</label><input id="screenshots" type="file" accept="image/*" multiple class="hidden"><button class="btn" id="demoBtn">ডেমো ডেটা যোগ</button></div></div>
+   <div class="progress"><span id="collectProgress"></span></div><div class="sub" id="collectText">বাস্তব রেকর্ড আলাদা থাকবে; ডেমো ডেটা দিয়ে আসল রেকর্ড প্রতিস্থাপন হবে না।</div>
+   <div class="notice warn">OCR ভুল পড়তে পারে। প্রতিটি শনাক্ত করা ৪-অঙ্কের ফলাফল যাচাই করে সংরক্ষণ করুন। ছবি থেকে ৪টি অঙ্ক নির্ভরযোগ্যভাবে না পাওয়া গেলে সেটি বাদ যাবে।</div>
   </div>
-
-  <script>
-    const TARGET_RECORDS = 500;
-    const STORAGE_KEY = "dk_win_ai_records_v6";
-    const FEEDBACK_KEY = "dk_win_ai_feedback_v6";
-    const LOG_KEY = "dk_win_ai_logs_v6";
-
-    let records = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-    let feedbacks = JSON.parse(localStorage.getItem(FEEDBACK_KEY) || "[]");
-    let learningLogs = JSON.parse(localStorage.getItem(LOG_KEY) || "[\"▶ নিউরাল ইঞ্জিন প্রস্তুত।\"]");
-    let isProcessingBatch = false;
-    let selectedOutcome = "";
-    let lastPrediction = null;
-
-    const collectStatus = document.getElementById("collectStatus");
-    const recordCounter = document.getElementById("recordCounter");
-    const progressBar = document.getElementById("progressBar");
-    const uploadLabel = document.getElementById("uploadLabel");
-    const screenshotInput = document.getElementById("screenshotInput");
-    const batchHint = document.getElementById("batchHint");
-    const lockStatus = document.getElementById("lockStatus");
-    const lockHint = document.getElementById("lockHint");
-    const analyzeBtn = document.getElementById("analyzeBtn");
-    const numInputs = [1, 2, 3, 4].map((i) => document.getElementById("n" + i));
-    const bigPct = document.getElementById("bigPct");
-    const smallPct = document.getElementById("smallPct");
-    const resultNote = document.getElementById("resultNote");
-    const savedCountLabel = document.getElementById("savedCountLabel");
-    const exportCsvBtn = document.getElementById("exportCsvBtn");
-    const exportJsonBtn = document.getElementById("exportJsonBtn");
-    const importJsonInput = document.getElementById("importJsonInput");
-    const statusMsg = document.getElementById("statusMsg");
-
-    const chooseBigBtn = document.getElementById("chooseBigBtn");
-    const chooseSmallBtn = document.getElementById("chooseSmallBtn");
-    const actualNumInput = document.getElementById("actualNumInput");
-    const submitFeedbackBtn = document.getElementById("submitFeedbackBtn");
-    const feedbackStatsLabel = document.getElementById("feedbackStatsLabel");
-    const feedbackHint = document.getElementById("feedbackHint");
-
-    const aiLevelBadge = document.getElementById("aiLevelBadge");
-    const aiStateText = document.getElementById("aiStateText");
-    const aiProgressPct = document.getElementById("aiProgressPct");
-    const aiProgressBar = document.getElementById("aiProgressBar");
-    const learningLog = document.getElementById("learningLog");
-
-    async function getFileHash(file) {
-      if (!file) return null;
-      return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const buffer = e.target.result;
-          let hash = 0;
-          const view = new DataView(buffer);
-          for (let i = 0; i < buffer.byteLength; i += Math.max(1, Math.floor(buffer.byteLength / 200))) {
-            hash = (hash << 5) - hash + view.getUint8(i);
-            hash |= 0;
-          }
-          resolve(file.name.replace(/\.[^/.]+$/, "") + "_" + hash.toString(36));
-        };
-        reader.readAsArrayBuffer(file);
-      });
-    }
-
-    function setMsg(text) {
-      statusMsg.textContent = text;
-    }
-
-    function addLog(msg) {
-      const timestamp = new Date().toLocaleTimeString();
-      const entry = `[${timestamp}] ${msg}`;
-      learningLogs.unshift(entry);
-      if (learningLogs.length > 50) learningLogs.pop();
-      localStorage.setItem(LOG_KEY, JSON.stringify(learningLogs));
-      renderLogs();
-    }
-
-    function renderLogs() {
-      learningLog.innerHTML = learningLogs.join("<br><br>");
-    }
-
-    function updateAIDashboard() {
-      const count = records.length;
-      let level = 1;
-
-      if (count > 500) {
-        level = Math.floor((count - 1) / 500) + 1;
-      }
-
-      const progressInRange = (count - 1) % 500 + 1;
-      const pct = Math.round((progressInRange / 500) * 100);
-
-      aiLevelBadge.textContent = `LEVEL ${level}`;
-      aiProgressPct.textContent = `${pct}%`;
-      aiProgressBar.style.width = `${pct}%`;
-
-      if (count < 500) {
-        aiStateText.textContent = "Markov State Space Mapping";
-      } else {
-        aiStateText.textContent = `Adaptive Deep Sequence (Records: ${count})`;
-      }
-    }
-
-    function clearResultDisplay(noteText = "ANALYZE বাটনে ট্যাপ করলে শতাংশ ফলাফল দেখাবে。") {
-      bigPct.textContent = "—%";
-      smallPct.textContent = "—%";
-      resultNote.textContent = noteText;
-    }
-
-    function updateFeedbackUI() {
-      const wins = feedbacks.filter((f) => f.matched === true).length;
-      const losses = feedbacks.filter((f) => f.matched === false).length;
-      feedbackStatsLabel.textContent = `W:${wins} | L:${losses}`;
-    }
-
-    function saveAndRender() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
-      localStorage.setItem(FEEDBACK_KEY, JSON.stringify(feedbacks));
-
-      const count = records.length;
-      recordCounter.textContent = `${count} / ${TARGET_RECORDS}`;
-      savedCountLabel.textContent = `${count} records`;
-
-      const unlocked = count >= TARGET_RECORDS;
-
-      if (count < TARGET_RECORDS) {
-        collectStatus.textContent = "COLLECTING";
-        collectStatus.className = "status-pill";
-        progressBar.style.width = `${Math.min(100, (count / TARGET_RECORDS) * 100)}%`;
-        lockStatus.textContent = "🔒 LOCKED";
-        lockHint.textContent = "৫০০টি রেকর্ড পূর্ণ হলে ইনপুট খুলবে۔";
-      } else if (count === TARGET_RECORDS) {
-        collectStatus.textContent = "READY";
-        collectStatus.className = "status-pill ready";
-        progressBar.style.width = "100%";
-        lockStatus.textContent = "🔓 UNLOCKED";
-        lockHint.textContent = "৫০০টি রেকর্ড পূর্ণ হয়েছে! ৪টি সংখ্যা লিখে ANALYZE বাটনে ট্যাপ করুন۔";
-        addLog("🎉 অভিনন্দন! সিকোয়েন্সিয়াল ডেটাবেজ প্রস্তুত। নিউরাল ইঞ্জিন সক্রিয়।");
-      } else {
-        collectStatus.textContent = "COMPLETED";
-        collectStatus.className = "status-pill completed";
-        progressBar.style.width = "100%";
-        lockStatus.textContent = "🔓 UNLOCKED";
-        lockHint.textContent = `মোট ${count}টি রেকর্ড সংরক্ষিত। সিস্টেম লাইভ লার্নিং মোডে আছে۔`;
-      }
-
-      numInputs.forEach((inp) => (inp.disabled = !unlocked));
-      analyzeBtn.disabled = !unlocked;
-      updateFeedbackUI();
-      updateAIDashboard();
-    }
-
-    numInputs.forEach((inp) => {
-      inp.addEventListener("input", () => {
-        if (inp.value.length > 1) {
-          inp.value = inp.value.slice(-1);
-        }
-        const num = Number(inp.value);
-        if (inp.value !== "" && (Number.isNaN(num) || num < 0 || num > 9)) {
-          inp.value = "";
-        }
-        clearResultDisplay("নতুন সিকোয়েন্স দেওয়া হয়েছে। ফলাফল দেখতে ANALYZE বাটনে ট্যাপ করুন۔");
-      });
-    });
-
-    function setOutcomeChoice(choice) {
-      selectedOutcome = choice;
-      chooseBigBtn.classList.toggle("active-big", choice === "BIG");
-      chooseSmallBtn.classList.toggle("active-small", choice === "SMALL");
-    }
-
-    chooseBigBtn.addEventListener("click", () => setOutcomeChoice("BIG"));
-    chooseSmallBtn.addEventListener("click", () => setOutcomeChoice("SMALL"));
-
-    actualNumInput.addEventListener("input", () => {
-      if (actualNumInput.value.length > 1) {
-        actualNumInput.value = actualNumInput.value.slice(-1);
-      }
-      const n = Number(actualNumInput.value);
-      if (actualNumInput.value === "" || Number.isNaN(n) || n < 0 || n > 9) {
-        actualNumInput.value = "";
-        return;
-      }
-      setOutcomeChoice(n >= 5 ? "BIG" : "SMALL");
-    });
-
-    function buildRecord(file, index, sourceLabel, hash) {
-      const digits = [
-        Math.floor(Math.random() * 10),
-        Math.floor(Math.random() * 10),
-        Math.floor(Math.random() * 10),
-        Math.floor(Math.random() * 10),
-      ];
-      const avg = digits.reduce((a, b) => a + b, 0) / 4;
-      return {
-        id: Date.now() + "-" + index + "-" + Math.random().toString(36).slice(2, 6),
-        fileHash: hash,
-        fileName: file ? file.name : sourceLabel,
-        digits,
-        outcome: avg >= 4.5 ? "BIG" : "SMALL",
-        source: sourceLabel,
-        time: new Date().toISOString(),
-      };
-    }
-
-    uploadLabel.addEventListener("click", () => {
-      if (!isProcessingBatch) {
-        screenshotInput.click();
-      }
-    });
-
-    screenshotInput.addEventListener("change", async (e) => {
-      const files = Array.from(e.target.files || []);
-
-      if (files.length === 0 || isProcessingBatch) return;
-
-      const imageFiles = files.filter(file => file.type.startsWith("image/"));
-
-      if (imageFiles.length === 0) {
-        setMsg("কোনো ছবি পাওয়া যায়নি!");
-        e.target.value = "";
-        return;
-      }
-
-      isProcessingBatch = true;
-      uploadLabel.classList.add("disabled");
-      setMsg("");
-
-      let added = 0;
-      let skipped = 0;
-
-      try {
-        const existingHashes = new Set(records.map(r => r.fileHash).filter(Boolean));
-
-        for (let i = 0; i < imageFiles.length; i++) {
-          const file = imageFiles[i];
-          batchHint.textContent = `সিকোয়েন্স ম্যাপিং: ${i + 1}/${imageFiles.length}`;
-
-          const hash = await getFileHash(file);
-          if (hash && existingHashes.has(hash)) {
-            skipped++;
-            continue;
-          }
-
-          if (hash) existingHashes.add(hash);
-          records.push(buildRecord(file, i, "screenshot_batch", hash));
-          added++;
-
-          if (added % 10 === 0) {
-            saveAndRender();
-            await new Promise(resolve => setTimeout(resolve, 20));
-          }
-        }
-
-        saveAndRender();
-        batchHint.textContent = "স্থানীয় ব্রাউজার স্টোরেজে রেকর্ড সংরক্ষিত হচ্ছে۔";
-        
-        let msgText = `সফলভাবে ${added}টি নতুন সিকোয়েন্স যুক্ত হয়েছে!`;
-        if (skipped > 0) {
-          msgText += ` (${skipped}টি ডুপ্লিকেট বাদ)`;
-        }
-        setMsg(msgText);
-
-        addLog(`📈 গ্যালারি প্রসেসিং সম্পন্ন۔ নতুন যুক্ত: ${added}টি, এড়ানো হয়েছে: ${skipped}টি৷ মোট ডেটাবেজ সাইজ: ${records.length} রেকর্ড৷`);
-      } catch (error) {
-        setMsg("প্রসেসিংয়ে ত্রুটি হয়েছে!");
-      } finally {
-        screenshotInput.value = "";
-        isProcessingBatch = false;
-        uploadLabel.classList.remove("disabled");
-      }
-    });
-
-    analyzeBtn.addEventListener("click", () => {
-      if (records.length < TARGET_RECORDS) {
-        setMsg(`কমপক্ষে ${TARGET_RECORDS}টি রেকর্ড প্রয়োজন۔`);
-        return;
-      }
-
-      const hasEmpty = numInputs.some((i) => i.value.trim() === "");
-      if (hasEmpty) {
-        setMsg("৪টি ঘরের সবকটিতে ০ থেকে ৯ এর মধ্যে সংখ্যা দিন۔");
-        return;
-      }
-
-      const targetSequence = numInputs.map((i) => Number(i.value)).join("");
-      
-      // MARKOV CHAIN & N-GRAM SEQUENCE PROBABILITY ENGINE
-      const nGramLength = 3; 
-      const sequenceCounts = { BIG: 0, SMALL: 0 };
-      const transitionMap = {};
-      let patternMatchCount = 0;
-
-      for (let i = 0; i < records.length; i++) {
-        const seqStr = records[i].digits.join("");
-        const outcome = records[i].outcome;
-        sequenceCounts[outcome]++;
-
-        if (seqStr.includes(targetSequence.slice(-2))) {
-          patternMatchCount++;
-          transitionMap[outcome] = (transitionMap[outcome] || 0) + 1;
-        }
-      }
-
-      const baseBigRate = sequenceCounts.BIG / records.length;
-      let sequenceBias = 0.5; 
-
-      const totalTransitions = (transitionMap.BIG || 0) + (transitionMap.SMALL || 0);
-      if (totalTransitions > 3) {
-        sequenceBias = (transitionMap.BIG || 0) / totalTransitions;
-      } else {
-        sequenceBias = baseBigRate;
-      }
-
-      // WEIGHTED MOVING AVERAGE (WMA) OF RECENT FEEDBACKS
-      const recentFeedbacks = feedbacks.slice(-50);
-      let wmaScore = 0;
-      let weightSum = 0;
-      
-      if (recentFeedbacks.length > 0) {
-        recentFeedbacks.forEach((f, idx) => {
-          const weight = idx + 1;
-          const val = f.actualOutcome === "BIG" ? 1 : 0;
-          wmaScore += val * weight;
-          weightSum += weight;
-        });
-        wmaScore = wmaScore / weightSum;
-      } else {
-        wmaScore = baseBigRate;
-      }
-
-      // REINFORCEMENT LEARNING CONFIDENCE ADJUSTMENT
-      const modernWins = feedbacks.filter((f) => f.matched === true).length;
-      const modernLosses = feedbacks.filter((f) => f.matched === false).length;
-      const winRate = (modernWins + modernLosses) > 0 ? modernWins / (modernWins + modernLosses) : 0.5;
-      const confidenceFactor = Math.min(1.4, Math.max(0.7, winRate * 2));
-
-      // HYBRID ENSEMBLE CALCULATION
-      const markovWeight = 0.55;
-      const wmaWeight = 0.30;
-      const baselineWeight = 0.15;
-
-      const blendedProbability = (sequenceBias * markovWeight) + (wmaScore * wmaWeight) + (baseBigRate * baselineWeight);
-      const adjustedProbability = Math.max(0.08, Math.min(0.92, blendedProbability * confidenceFactor));
-
-      const finalBig = Math.round(adjustedProbability * 100);
-      const finalSmall = 100 - finalBig;
-
-      lastPrediction = {
-        inputSequence: targetSequence,
-        predictedOutcome: finalBig >= 50 ? "BIG" : "SMALL",
-        bigPct: finalBig,
-        smallPct: finalSmall,
-      };
-
-      bigPct.textContent = `${finalBig}%`;
-      smallPct.textContent = `${finalSmall}%`;
-      resultNote.textContent = `সিকোয়েন্স ম্যাচ: ${patternMatchCount} | WMA কনফিডেন্স: ${Math.round(wmaScore * 100)}%`;
-
-      addLog(`🔍 প্রিমিয়াম অ্যানালাইসিস [ইনপুট: ${targetSequence}] → প্রেডিকশন: ${finalBig >= 50 ? "BIG" : "SMALL"} (${finalBig}%)৷ মারকভ চেইন ও ওয়েটেড মুভিং এভারেজ সিঙ্কড৷`);
-      setMsg("উন্নত প্রেডিকশন জেনারেট হয়েছে।");
-    });
-
-    submitFeedbackBtn.addEventListener("click", () => {
-      if (actualNumInput.value.trim() === "") {
-        feedbackHint.textContent = "আসল ফলাফলের সংখ্যাটি (০ থেকে ৯) লিখুন۔";
-        return;
-      }
-
-      const actualNum = Number(actualNumInput.value);
-      if (Number.isNaN(actualNum) || actualNum < 0 || actualNum > 9) {
-        feedbackHint.textContent = "০ থেকে ৯ এর মধ্যে সঠিক সংখ্যা দিন۔";
-        return;
-      }
-
-      const actualOutcome = selectedOutcome || (actualNum >= 5 ? "BIG" : "SMALL");
-      const inputVals = numInputs.map((i) => (i.value.trim() === "" ? actualNum : Number(i.value)));
-      const matched = lastPrediction ? lastPrediction.predictedOutcome === actualOutcome : null;
-
-      records.push({
-        id: "live-" + Date.now(),
-        fileName: `live_${actualOutcome}_${actualNum}`,
-        digits: [inputVals[1], inputVals[2], inputVals[3], actualNum],
-        outcome: actualOutcome,
-        actualNumber: actualNum,
-        source: "live_feedback",
-        time: new Date().toISOString(),
-      });
-
-      feedbacks.push({
-        time: new Date().toISOString(),
-        predictedOutcome: lastPrediction ? lastPrediction.predictedOutcome : "NONE",
-        actualOutcome,
-        actualNumber: actualNum,
-        matched,
-      });
-
-      if (numInputs.every((i) => i.value.trim() !== "")) {
-        numInputs[0].value = numInputs[1].value;
-        numInputs[1].value = numInputs[2].value;
-        numInputs[2].value = numInputs[3].value;
-        numInputs[3].value = actualNum;
-      }
-
-      actualNumInput.value = "";
-      setOutcomeChoice("");
-      saveAndRender();
-
-      const statusText = matched === true ? "WIN (সঠিক)" : matched === false ? "LOSS (ভুল - ওয়েট অ্যাডজাস্টমেন্ট হয়েছে)" : "সংরক্ষিত";
-      addLog(`⚡ রিইনফোর্সমেন্ট ফিডব্যাক: [${actualOutcome} ${actualNum}] — স্ট্যাটাস: ${statusText}৷ ওয়েট ম্যাট্রিক্স আপডেট সম্পন্ন৷`);
-
-      feedbackHint.textContent = `${actualOutcome} ${actualNum} সংরক্ষিত। নতুন প্রেডিকশন দেখতে ANALYZE চাপুন।`;
-      clearResultDisplay("ফিডব্যাক গৃহীত হয়েছে। নতুন সিকোয়েন্স অ্যানালাইসিস করতে ANALYZE চাপুন।");
-      setMsg(`ওয়েট আপডেট হয়েছে (${actualOutcome} ${actualNum})।`);
-    });
-
-    function downloadFile(filename, content, mimeType) {
-      const blob = new Blob([content], { type: mimeType });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = filename;
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    exportCsvBtn.addEventListener("click", () => {
-      if (!records.length) {
-        setMsg("এক্সপোর্ট করার মতো কোনো ডেটা নেই۔");
-        return;
-      }
-      const rows = ["id,fileName,digits,outcome,source,time"];
-      records.forEach((r) => {
-        rows.push(`"${r.id}","${r.fileName || ""}","${r.digits.join("-")}","${r.outcome}","${r.source}","${r.time}"`);
-      });
-      downloadFile("dk-win-ai-records.csv", rows.join("\n"), "text/csv;charset=utf-8;");
-      addLog("📥 ডেটাবেজ CSV ফরম্যাটে এক্সপোর্ট করা হয়েছে۔");
-      setMsg("CSV ফাইল ডাউনলোড হয়েছে।");
-    });
-
-    exportJsonBtn.addEventListener("click", () => {
-      if (!records.length) {
-        setMsg("ব্যাকআপ করার মতো কোনো ডেটা নেই۔");
-        return;
-      }
-      downloadFile("dk-win-ai-backup.json", JSON.stringify({ records, feedbacks, learningLogs }, null, 2), "application/json");
-      addLog("💾 সম্পূর্ণ মেমোরি ব্যাকআপ (JSON) ডাউনলোড করা হয়েছে۔");
-      setMsg("JSON ব্যাকআপ ফাইল ডাউনলোড হয়েছে।");
-    });
-
-    importJsonInput.addEventListener("change", async (e) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-      try {
-        const text = await file.text();
-        const parsed = JSON.parse(text);
-        if (Array.isArray(parsed)) {
-          records = parsed;
-        } else if (parsed && Array.isArray(parsed.records)) {
-          records = parsed.records;
-          feedbacks = Array.isArray(parsed.feedbacks) ? parsed.feedbacks : [];
-          if (Array.isArray(parsed.learningLogs)) learningLogs = parsed.learningLogs;
-        } else {
-          throw new Error("Invalid format");
-        }
-        clearResultDisplay();
-        saveAndRender();
-        addLog(`📂 ডেটাবেজ ইমপোর্ট সম্পন্ন। মোট রেকর্ড সংখ্যা: ${records.length}۔`);
-        setMsg(`${records.length}টি রেকর্ড ইমপোর্ট হয়েছে।`);
-      } catch {
-        setMsg("সঠিক JSON ব্যাকআপ ফাইল সিলেক্ট করুন।");
-      }
-      e.target.value = "";
-    });
-
-    renderLogs();
-    saveAndRender();
-  </script>
-</body>
-  </html><!DOCTYPE html>
-<html lang="bn">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DK WIN AI - Premium Sequence Analysis</title>
-  <style>
-    :root {
-      --bg: #070b14;
-      --card: #0f172a;
-      --card-2: #131f38;
-      --border: #1e293b;
-      --text: #f8fafc;
-      --muted: #94a3b8;
-      --accent: #38bdf8;
-      --green: #14532d;
-      --green-border: #22c55e;
-      --red: #450a0a;
-      --red-border: #ef4444;
-      --purple: #581c87;
-      --purple-border: #c084fc;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      padding: 16px;
-      display: flex;
-      justify-content: center;
-    }
-
-    .app {
-      width: 100%;
-      max-width: 460px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 14px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-    }
-
-    .brand h1 {
-      font-size: 18px;
-      letter-spacing: 0.5px;
-    }
-
-    .brand p {
-      font-size: 11px;
-      color: var(--muted);
-      margin-top: 2px;
-    }
-
-    .badge {
-      background: rgba(56, 189, 248, 0.15);
-      color: var(--accent);
-      border: 1px solid rgba(56, 189, 248, 0.35);
-      padding: 5px 9px;
-      border-radius: 8px;
-      font-size: 11px;
-      font-weight: 700;
-    }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .card-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    .status-pill {
-      padding: 3px 8px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 700;
-      background: rgba(245, 158, 11, 0.15);
-      color: #fbbf24;
-    }
-
-    .status-pill.ready {
-      background: rgba(34, 197, 94, 0.15);
-      color: #4ade80;
-    }
-
-    .status-pill.completed {
-      background: rgba(168, 85, 247, 0.15);
-      color: #c084fc;
-    }
-
-    .counter {
-      font-size: 28px;
-      font-weight: 800;
-      text-align: center;
-      color: var(--accent);
-    }
-
-    .progress-wrap {
-      width: 100%;
-      height: 8px;
-      background: #1e293b;
-      border-radius: 999px;
-      overflow: hidden;
-    }
-
-    .progress-bar {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #0284c7, #38bdf8);
-      transition: width 0.25s ease;
-    }
-
-    .btn {
-      width: 100%;
-      padding: 12px 14px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--card-2);
-      color: var(--text);
-      font-weight: 700;
-      font-size: 14px;
-      cursor: pointer;
-    }
-
-    .btn-primary {
-      background: #0284c7;
-      border-color: #0ea5e9;
-      color: #fff;
-    }
-
-    .btn:disabled,
-    .btn.disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-      pointer-events: none;
-    }
-
-    .hint {
-      font-size: 12px;
-      color: var(--muted);
-      text-align: center;
-      line-height: 1.45;
-    }
-
-    .inputs {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-    }
-
-    .inputs input {
-      width: 100%;
-      text-align: center;
-      font-size: 18px;
-      font-weight: 700;
-      padding: 10px;
-      border-radius: 10px;
-      border: 1px solid #334155;
-      background: #090e1a;
-      color: var(--text);
-    }
-
-    .results {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .box {
-      padding: 14px;
-      border-radius: 12px;
-      text-align: center;
-      border: 1px solid transparent;
-    }
-
-    .box.big {
-      background: var(--green);
-      border-color: var(--green-border);
-    }
-
-    .box.small {
-      background: var(--red);
-      border-color: var(--red-border);
-    }
-
-    .box .label {
-      font-size: 12px;
-      font-weight: 700;
-      opacity: 0.9;
-    }
-
-    .box .pct {
-      font-size: 24px;
-      font-weight: 800;
-      margin-top: 4px;
-    }
-
-    .backup-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-    }
-
-    .feedback-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr 95px;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .choice-btn {
-      padding: 11px 8px;
-      border-radius: 10px;
-      border: 1px solid #334155;
-      background: #090e1a;
-      color: var(--muted);
-      font-weight: 800;
-      font-size: 13px;
-      cursor: pointer;
-    }
-
-    .choice-btn.active-big {
-      background: var(--green);
-      border-color: var(--green-border);
-      color: #fff;
-    }
-
-    .choice-btn.active-small {
-      background: var(--red);
-      border-color: var(--red-border);
-      color: #fff;
-    }
-
-    .feedback-num {
-      width: 100%;
-      text-align: center;
-      font-size: 16px;
-      font-weight: 700;
-      padding: 10px 8px;
-      border-radius: 10px;
-      border: 1px solid #334155;
-      background: #090e1a;
-      color: var(--text);
-    }
-
-    .ai-dashboard {
-      background: rgba(88, 28, 135, 0.15);
-      border: 1px solid var(--purple-border);
-      border-radius: 12px;
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .ai-meta {
-      display: flex;
-      justify-content: space-between;
-      font-size: 13px;
-      font-weight: 700;
-      color: #c084fc;
-    }
-
-    .level-bar-wrap {
-      width: 100%;
-      height: 10px;
-      background: #3b0764;
-      border-radius: 999px;
-      overflow: hidden;
-    }
-
-    .level-bar {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #9333ea, #c084fc);
-      transition: width 0.3s ease;
-    }
-
-    .learning-log {
-      font-size: 12px;
-      color: #e9d5ff;
-      background: rgba(0, 0, 0, 0.4);
-      padding: 10px;
-      border-radius: 8px;
-      max-height: 120px;
-      overflow-y: auto;
-      line-height: 1.4;
-      border-left: 3px solid var(--purple-border);
-    }
-
-    .msg {
-      font-size: 12px;
-      color: #38bdf8;
-      text-align: center;
-      min-height: 18px;
-    }
-  </style>
-</head>
-<body>
-  <div class="app">
-    <div class="header">
-      <div class="brand">
-        <h1>DK WIN AI</h1>
-        <p>PREMIUM SEQUENCE ANALYSIS</p>
-      </div>
-      <div class="badge">WIN GO 1 MINUTE</div>
-    </div>
-
-    <!-- AI Live Intelligence Dashboard -->
-    <div class="card ai-dashboard">
-      <div class="card-top">
-        <span>ADVANCED NEURAL ENGINE</span>
-        <span id="aiLevelBadge" class="status-pill">LEVEL 1</span>
-      </div>
-      <div class="ai-meta">
-        <span id="aiStateText">Model Training Initialized</span>
-        <span id="aiProgressPct">0%</span>
-      </div>
-      <div class="level-bar-wrap">
-        <div class="level-bar" id="aiProgressBar"></div>
-      </div>
-      <div class="learning-log" id="learningLog">
-        ▶ সিস্টেম প্রস্তুত হচ্ছে... স্ক্রিনশট আপলোড করে ট্রেনিং শুরু করুন।
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-top">
-        <span>SCREENSHOT COLLECTION</span>
-        <span class="status-pill" id="collectStatus">COLLECTING</span>
-      </div>
-
-      <div class="counter" id="recordCounter">0 / 500</div>
-      <div class="progress-wrap">
-        <div class="progress-bar" id="progressBar"></div>
-      </div>
-
-      <label class="btn btn-primary" id="uploadLabel" style="text-align:center;">
-        📸 একসাথে অনেকগুলো স্ক্রিনশট সিলেক্ট করুন
-      </label>
-
-      <input
-        type="file"
-        id="screenshotInput"
-        accept="image/*"
-        multiple
-        style="display:none;"
-      />
-
-      <p class="hint" id="batchHint">
-        স্থানীয় ব্রাউজার স্টোরেজে রেকর্ড সংরক্ষিত হচ্ছে। ডুপ্লিকেট অটো-ফিল্টার সক্রিয়।
-      </p>
-    </div>
-
-    <div class="card">
-      <div class="card-top">
-        <span>FOUR NUMBER INPUT</span>
-        <span class="status-pill" id="lockStatus">🔒 LOCKED</span>
-      </div>
-
-      <div class="inputs">
-        <input type="number" min="0" max="9" id="n1" placeholder="0" disabled />
-        <input type="number" min="0" max="9" id="n2" placeholder="0" disabled />
-        <input type="number" min="0" max="9" id="n3" placeholder="0" disabled />
-        <input type="number" min="0" max="9" id="n4" placeholder="0" disabled />
-      </div>
-
-      <button type="button" class="btn btn-primary" id="analyzeBtn" disabled>ANALYZE SEQUENCE</button>
-      <p class="hint" id="lockHint">৫০০টি রেকর্ড পূর্ণ হলে ইনপুট খুলবে。</p>
-    </div>
-
-    <div class="card">
-      <div class="card-top">
-        <span>PREMIUM AI PREDICTION</span>
-        <span>PROBABILITY STATS</span>
-      </div>
-
-      <div class="results">
-        <div class="box big">
-          <div class="label">BIG</div>
-          <div class="pct" id="bigPct">—%</div>
-        </div>
-        <div class="box small">
-          <div class="label">SMALL</div>
-          <div class="pct" id="smallPct">—%</div>
-        </div>
-      </div>
-
-      <p class="hint" id="resultNote">ANALYZE বাটনে ট্যাপ করলে মারকভ চেইন ও ওয়েটেড মুভিং এভারেজ ফলাফল দেখাবে।</p>
-    </div>
-
-    <div class="card">
-      <div class="card-top">
-        <span>DATA BACKUP</span>
-        <span id="savedCountLabel">0 records</span>
-      </div>
-
-      <div class="backup-grid">
-        <button class="btn btn-sm" id="exportCsvBtn">CSV EXPORT</button>
-        <button class="btn btn-sm" id="exportJsonBtn">JSON BACKUP</button>
-        <label class="btn btn-sm" style="text-align:center;">
-          IMPORT
-          <input type="file" id="importJsonInput" accept=".json,application/json" hidden />
-        </label>
-      </div>
-
-      <div class="msg" id="statusMsg"></div>
-    </div>
-
-    <div class="card">
-      <div class="card-top">
-        <span>ACTUAL RESULT FEEDBACK</span>
-        <span id="feedbackStatsLabel">0 feedback</span>
-      </div>
-
-      <div class="feedback-row">
-        <button type="button" class="choice-btn" id="chooseBigBtn">BIG (5-9)</button>
-        <button type="button" class="choice-btn" id="chooseSmallBtn">SMALL (0-4)</button>
-        <input
-          type="number"
-          min="0"
-          max="9"
-          id="actualNumInput"
-          class="feedback-num"
-          placeholder="সংখ্যা"
-        />
-      </div>
-
-      <button type="button" class="btn btn-primary" id="submitFeedbackBtn">
-        ফলাফল জমা দিন ও ওয়েট আপডেট করুন
-      </button>
-
-      <p class="hint" id="feedbackHint">
-        ফিডব্যাক দিলে রিইনফোর্সমেন্ট লার্নিং অ্যালগরিদম প্রেডিকশন সূক্ষ্মতর করবে।
-      </p>
-    </div>
+  <div class="card">
+   <div class="card-head"><h2>Prediction Overview</h2><span class="badge">EMPIRICAL</span></div>
+   <div class="result-grid"><div class="result big"><span>BIG</span><strong id="dashBig">—%</strong></div><div class="result small"><span>SMALL</span><strong id="dashSmall">—%</strong></div></div>
+   <p class="sub" id="dashPredictionNote" style="margin-top:13px">Analysis পেজে চার অঙ্ক দিয়ে হিসাব শুরু করুন।</p>
+   <div class="notice">শতাংশ অতীতের ডেটার পরিসংখ্যান; ভবিষ্যৎ ফলাফলের নিশ্চয়তা নয়।</div>
   </div>
-
-  <script>
-    const TARGET_RECORDS = 500;
-    const STORAGE_KEY = "dk_win_ai_records_v6";
-    const FEEDBACK_KEY = "dk_win_ai_feedback_v6";
-    const LOG_KEY = "dk_win_ai_logs_v6";
-
-    let records = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-    let feedbacks = JSON.parse(localStorage.getItem(FEEDBACK_KEY) || "[]");
-    let learningLogs = JSON.parse(localStorage.getItem(LOG_KEY) || "[\"▶ নিউরাল ইঞ্জিন প্রস্তুত।\"]");
-    let isProcessingBatch = false;
-    let selectedOutcome = "";
-    let lastPrediction = null;
-
-    const collectStatus = document.getElementById("collectStatus");
-    const recordCounter = document.getElementById("recordCounter");
-    const progressBar = document.getElementById("progressBar");
-    const uploadLabel = document.getElementById("uploadLabel");
-    const screenshotInput = document.getElementById("screenshotInput");
-    const batchHint = document.getElementById("batchHint");
-    const lockStatus = document.getElementById("lockStatus");
-    const lockHint = document.getElementById("lockHint");
-    const analyzeBtn = document.getElementById("analyzeBtn");
-    const numInputs = [1, 2, 3, 4].map((i) => document.getElementById("n" + i));
-    const bigPct = document.getElementById("bigPct");
-    const smallPct = document.getElementById("smallPct");
-    const resultNote = document.getElementById("resultNote");
-    const savedCountLabel = document.getElementById("savedCountLabel");
-    const exportCsvBtn = document.getElementById("exportCsvBtn");
-    const exportJsonBtn = document.getElementById("exportJsonBtn");
-    const importJsonInput = document.getElementById("importJsonInput");
-    const statusMsg = document.getElementById("statusMsg");
-
-    const chooseBigBtn = document.getElementById("chooseBigBtn");
-    const chooseSmallBtn = document.getElementById("chooseSmallBtn");
-    const actualNumInput = document.getElementById("actualNumInput");
-    const submitFeedbackBtn = document.getElementById("submitFeedbackBtn");
-    const feedbackStatsLabel = document.getElementById("feedbackStatsLabel");
-    const feedbackHint = document.getElementById("feedbackHint");
-
-    const aiLevelBadge = document.getElementById("aiLevelBadge");
-    const aiStateText = document.getElementById("aiStateText");
-    const aiProgressPct = document.getElementById("aiProgressPct");
-    const aiProgressBar = document.getElementById("aiProgressBar");
-    const learningLog = document.getElementById("learningLog");
-
-    async function getFileHash(file) {
-      if (!file) return null;
-      return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const buffer = e.target.result;
-          let hash = 0;
-          const view = new DataView(buffer);
-          for (let i = 0; i < buffer.byteLength; i += Math.max(1, Math.floor(buffer.byteLength / 200))) {
-            hash = (hash << 5) - hash + view.getUint8(i);
-            hash |= 0;
-          }
-          resolve(file.name.replace(/\.[^/.]+$/, "") + "_" + hash.toString(36));
-        };
-        reader.readAsArrayBuffer(file);
-      });
-    }
-
-    function setMsg(text) {
-      statusMsg.textContent = text;
-    }
-
-    function addLog(msg) {
-      const timestamp = new Date().toLocaleTimeString();
-      const entry = `[${timestamp}] ${msg}`;
-      learningLogs.unshift(entry);
-      if (learningLogs.length > 50) learningLogs.pop();
-      localStorage.setItem(LOG_KEY, JSON.stringify(learningLogs));
-      renderLogs();
-    }
-
-    function renderLogs() {
-      learningLog.innerHTML = learningLogs.join("<br><br>");
-    }
-
-    function updateAIDashboard() {
-      const count = records.length;
-      let level = 1;
-
-      if (count > 500) {
-        level = Math.floor((count - 1) / 500) + 1;
-      }
-
-      const progressInRange = (count - 1) % 500 + 1;
-      const pct = Math.round((progressInRange / 500) * 100);
-
-      aiLevelBadge.textContent = `LEVEL ${level}`;
-      aiProgressPct.textContent = `${pct}%`;
-      aiProgressBar.style.width = `${pct}%`;
-
-      if (count < 500) {
-        aiStateText.textContent = "Markov State Space Mapping";
-      } else {
-        aiStateText.textContent = `Adaptive Deep Sequence (Records: ${count})`;
-      }
-    }
-
-    function clearResultDisplay(noteText = "ANALYZE বাটনে ট্যাপ করলে শতাংশ ফলাফল দেখাবে。") {
-      bigPct.textContent = "—%";
-      smallPct.textContent = "—%";
-      resultNote.textContent = noteText;
-    }
-
-    function updateFeedbackUI() {
-      const wins = feedbacks.filter((f) => f.matched === true).length;
-      const losses = feedbacks.filter((f) => f.matched === false).length;
-      feedbackStatsLabel.textContent = `W:${wins} | L:${losses}`;
-    }
-
-    function saveAndRender() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
-      localStorage.setItem(FEEDBACK_KEY, JSON.stringify(feedbacks));
-
-      const count = records.length;
-      recordCounter.textContent = `${count} / ${TARGET_RECORDS}`;
-      savedCountLabel.textContent = `${count} records`;
-
-      const unlocked = count >= TARGET_RECORDS;
-
-      if (count < TARGET_RECORDS) {
-        collectStatus.textContent = "COLLECTING";
-        collectStatus.className = "status-pill";
-        progressBar.style.width = `${Math.min(100, (count / TARGET_RECORDS) * 100)}%`;
-        lockStatus.textContent = "🔒 LOCKED";
-        lockHint.textContent = "৫০০টি রেকর্ড পূর্ণ হলে ইনপুট খুলবে۔";
-      } else if (count === TARGET_RECORDS) {
-        collectStatus.textContent = "READY";
-        collectStatus.className = "status-pill ready";
-        progressBar.style.width = "100%";
-        lockStatus.textContent = "🔓 UNLOCKED";
-        lockHint.textContent = "৫০০টি রেকর্ড পূর্ণ হয়েছে! ৪টি সংখ্যা লিখে ANALYZE বাটনে ট্যাপ করুন۔";
-        addLog("🎉 অভিনন্দন! সিকোয়েন্সিয়াল ডেটাবেজ প্রস্তুত। নিউরাল ইঞ্জিন সক্রিয়।");
-      } else {
-        collectStatus.textContent = "COMPLETED";
-        collectStatus.className = "status-pill completed";
-        progressBar.style.width = "100%";
-        lockStatus.textContent = "🔓 UNLOCKED";
-        lockHint.textContent = `মোট ${count}টি রেকর্ড সংরক্ষিত। সিস্টেম লাইভ লার্নিং মোডে আছে۔`;
-      }
-
-      numInputs.forEach((inp) => (inp.disabled = !unlocked));
-      analyzeBtn.disabled = !unlocked;
-      updateFeedbackUI();
-      updateAIDashboard();
-    }
-
-    numInputs.forEach((inp) => {
-      inp.addEventListener("input", () => {
-        if (inp.value.length > 1) {
-          inp.value = inp.value.slice(-1);
-        }
-        const num = Number(inp.value);
-        if (inp.value !== "" && (Number.isNaN(num) || num < 0 || num > 9)) {
-          inp.value = "";
-        }
-        clearResultDisplay("নতুন সিকোয়েন্স দেওয়া হয়েছে। ফলাফল দেখতে ANALYZE বাটনে ট্যাপ করুন۔");
-      });
-    });
-
-    function setOutcomeChoice(choice) {
-      selectedOutcome = choice;
-      chooseBigBtn.classList.toggle("active-big", choice === "BIG");
-      chooseSmallBtn.classList.toggle("active-small", choice === "SMALL");
-    }
-
-    chooseBigBtn.addEventListener("click", () => setOutcomeChoice("BIG"));
-    chooseSmallBtn.addEventListener("click", () => setOutcomeChoice("SMALL"));
-
-    actualNumInput.addEventListener("input", () => {
-      if (actualNumInput.value.length > 1) {
-        actualNumInput.value = actualNumInput.value.slice(-1);
-      }
-      const n = Number(actualNumInput.value);
-      if (actualNumInput.value === "" || Number.isNaN(n) || n < 0 || n > 9) {
-        actualNumInput.value = "";
-        return;
-      }
-      setOutcomeChoice(n >= 5 ? "BIG" : "SMALL");
-    });
-
-    function buildRecord(file, index, sourceLabel, hash) {
-      const digits = [
-        Math.floor(Math.random() * 10),
-        Math.floor(Math.random() * 10),
-        Math.floor(Math.random() * 10),
-        Math.floor(Math.random() * 10),
-      ];
-      const avg = digits.reduce((a, b) => a + b, 0) / 4;
-      return {
-        id: Date.now() + "-" + index + "-" + Math.random().toString(36).slice(2, 6),
-        fileHash: hash,
-        fileName: file ? file.name : sourceLabel,
-        digits,
-        outcome: avg >= 4.5 ? "BIG" : "SMALL",
-        source: sourceLabel,
-        time: new Date().toISOString(),
-      };
-    }
-
-    uploadLabel.addEventListener("click", () => {
-      if (!isProcessingBatch) {
-        screenshotInput.click();
-      }
-    });
-
-    screenshotInput.addEventListener("change", async (e) => {
-      const files = Array.from(e.target.files || []);
-
-      if (files.length === 0 || isProcessingBatch) return;
-
-      const imageFiles = files.filter(file => file.type.startsWith("image/"));
-
-      if (imageFiles.length === 0) {
-        setMsg("কোনো ছবি পাওয়া যায়নি!");
-        e.target.value = "";
-        return;
-      }
-
-      isProcessingBatch = true;
-      uploadLabel.classList.add("disabled");
-      setMsg("");
-
-      let added = 0;
-      let skipped = 0;
-
-      try {
-        const existingHashes = new Set(records.map(r => r.fileHash).filter(Boolean));
-
-        for (let i = 0; i < imageFiles.length; i++) {
-          const file = imageFiles[i];
-          batchHint.textContent = `সিকোয়েন্স ম্যাপিং: ${i + 1}/${imageFiles.length}`;
-
-          const hash = await getFileHash(file);
-          if (hash && existingHashes.has(hash)) {
-            skipped++;
-            continue;
-          }
-
-          if (hash) existingHashes.add(hash);
-          records.push(buildRecord(file, i, "screenshot_batch", hash));
-          added++;
-
-          if (added % 10 === 0) {
-            saveAndRender();
-            await new Promise(resolve => setTimeout(resolve, 20));
-          }
-        }
-
-        saveAndRender();
-        batchHint.textContent = "স্থানীয় ব্রাউজার স্টোরেজে রেকর্ড সংরক্ষিত হচ্ছে۔";
-        
-        let msgText = `সফলভাবে ${added}টি নতুন সিকোয়েন্স যুক্ত হয়েছে!`;
-        if (skipped > 0) {
-          msgText += ` (${skipped}টি ডুপ্লিকেট বাদ)`;
-        }
-        setMsg(msgText);
-
-        addLog(`📈 গ্যালারি প্রসেসিং সম্পন্ন۔ নতুন যুক্ত: ${added}টি, এড়ানো হয়েছে: ${skipped}টি৷ মোট ডেটাবেজ সাইজ: ${records.length} রেকর্ড৷`);
-      } catch (error) {
-        setMsg("প্রসেসিংয়ে ত্রুটি হয়েছে!");
-      } finally {
-        screenshotInput.value = "";
-        isProcessingBatch = false;
-        uploadLabel.classList.remove("disabled");
-      }
-    });
-
-    analyzeBtn.addEventListener("click", () => {
-      if (records.length < TARGET_RECORDS) {
-        setMsg(`কমপক্ষে ${TARGET_RECORDS}টি রেকর্ড প্রয়োজন۔`);
-        return;
-      }
-
-      const hasEmpty = numInputs.some((i) => i.value.trim() === "");
-      if (hasEmpty) {
-        setMsg("৪টি ঘরের সবকটিতে ০ থেকে ৯ এর মধ্যে সংখ্যা দিন۔");
-        return;
-      }
-
-      const targetSequence = numInputs.map((i) => Number(i.value)).join("");
-      
-      // MARKOV CHAIN & N-GRAM SEQUENCE PROBABILITY ENGINE
-      const nGramLength = 3; 
-      const sequenceCounts = { BIG: 0, SMALL: 0 };
-      const transitionMap = {};
-      let patternMatchCount = 0;
-
-      for (let i = 0; i < records.length; i++) {
-        const seqStr = records[i].digits.join("");
-        const outcome = records[i].outcome;
-        sequenceCounts[outcome]++;
-
-        if (seqStr.includes(targetSequence.slice(-2))) {
-          patternMatchCount++;
-          transitionMap[outcome] = (transitionMap[outcome] || 0) + 1;
-        }
-      }
-
-      const baseBigRate = sequenceCounts.BIG / records.length;
-      let sequenceBias = 0.5; 
-
-      const totalTransitions = (transitionMap.BIG || 0) + (transitionMap.SMALL || 0);
-      if (totalTransitions > 3) {
-        sequenceBias = (transitionMap.BIG || 0) / totalTransitions;
-      } else {
-        sequenceBias = baseBigRate;
-      }
-
-      // WEIGHTED MOVING AVERAGE (WMA) OF RECENT FEEDBACKS
-      const recentFeedbacks = feedbacks.slice(-50);
-      let wmaScore = 0;
-      let weightSum = 0;
-      
-      if (recentFeedbacks.length > 0) {
-        recentFeedbacks.forEach((f, idx) => {
-          const weight = idx + 1;
-          const val = f.actualOutcome === "BIG" ? 1 : 0;
-          wmaScore += val * weight;
-          weightSum += weight;
-        });
-        wmaScore = wmaScore / weightSum;
-      } else {
-        wmaScore = baseBigRate;
-      }
-
-      // REINFORCEMENT LEARNING CONFIDENCE ADJUSTMENT
-      const modernWins = feedbacks.filter((f) => f.matched === true).length;
-      const modernLosses = feedbacks.filter((f) => f.matched === false).length;
-      const winRate = (modernWins + modernLosses) > 0 ? modernWins / (modernWins + modernLosses) : 0.5;
-      const confidenceFactor = Math.min(1.4, Math.max(0.7, winRate * 2));
-
-      // HYBRID ENSEMBLE CALCULATION
-      const markovWeight = 0.55;
-      const wmaWeight = 0.30;
-      const baselineWeight = 0.15;
-
-      const blendedProbability = (sequenceBias * markovWeight) + (wmaScore * wmaWeight) + (baseBigRate * baselineWeight);
-      const adjustedProbability = Math.max(0.08, Math.min(0.92, blendedProbability * confidenceFactor));
-
-      const finalBig = Math.round(adjustedProbability * 100);
-      const finalSmall = 100 - finalBig;
-
-      lastPrediction = {
-        inputSequence: targetSequence,
-        predictedOutcome: finalBig >= 50 ? "BIG" : "SMALL",
-        bigPct: finalBig,
-        smallPct: finalSmall,
-      };
-
-      bigPct.textContent = `${finalBig}%`;
-      smallPct.textContent = `${finalSmall}%`;
-      resultNote.textContent = `সিকোয়েন্স ম্যাচ: ${patternMatchCount} | WMA কনফিডেন্স: ${Math.round(wmaScore * 100)}%`;
-
-      addLog(`🔍 প্রিমিয়াম অ্যানালাইসিস [ইনপুট: ${targetSequence}] → প্রেডিকশন: ${finalBig >= 50 ? "BIG" : "SMALL"} (${finalBig}%)৷ মারকভ চেইন ও ওয়েটেড মুভিং এভারেজ সিঙ্কড৷`);
-      setMsg("উন্নত প্রেডিকশন জেনারেট হয়েছে।");
-    });
-
-    submitFeedbackBtn.addEventListener("click", () => {
-      if (actualNumInput.value.trim() === "") {
-        feedbackHint.textContent = "আসল ফলাফলের সংখ্যাটি (০ থেকে ৯) লিখুন۔";
-        return;
-      }
-
-      const actualNum = Number(actualNumInput.value);
-      if (Number.isNaN(actualNum) || actualNum < 0 || actualNum > 9) {
-        feedbackHint.textContent = "০ থেকে ৯ এর মধ্যে সঠিক সংখ্যা দিন۔";
-        return;
-      }
-
-      const actualOutcome = selectedOutcome || (actualNum >= 5 ? "BIG" : "SMALL");
-      const inputVals = numInputs.map((i) => (i.value.trim() === "" ? actualNum : Number(i.value)));
-      const matched = lastPrediction ? lastPrediction.predictedOutcome === actualOutcome : null;
-
-      records.push({
-        id: "live-" + Date.now(),
-        fileName: `live_${actualOutcome}_${actualNum}`,
-        digits: [inputVals[1], inputVals[2], inputVals[3], actualNum],
-        outcome: actualOutcome,
-        actualNumber: actualNum,
-        source: "live_feedback",
-        time: new Date().toISOString(),
-      });
-
-      feedbacks.push({
-        time: new Date().toISOString(),
-        predictedOutcome: lastPrediction ? lastPrediction.predictedOutcome : "NONE",
-        actualOutcome,
-        actualNumber: actualNum,
-        matched,
-      });
-
-      if (numInputs.every((i) => i.value.trim() !== "")) {
-        numInputs[0].value = numInputs[1].value;
-        numInputs[1].value = numInputs[2].value;
-        numInputs[2].value = numInputs[3].value;
-        numInputs[3].value = actualNum;
-      }
-
-      actualNumInput.value = "";
-      setOutcomeChoice("");
-      saveAndRender();
-
-      const statusText = matched === true ? "WIN (সঠিক)" : matched === false ? "LOSS (ভুল - ওয়েট অ্যাডজাস্টমেন্ট হয়েছে)" : "সংরক্ষিত";
-      addLog(`⚡ রিইনফোর্সমেন্ট ফিডব্যাক: [${actualOutcome} ${actualNum}] — স্ট্যাটাস: ${statusText}৷ ওয়েট ম্যাট্রিক্স আপডেট সম্পন্ন৷`);
-
-      feedbackHint.textContent = `${actualOutcome} ${actualNum} সংরক্ষিত। নতুন প্রেডিকশন দেখতে ANALYZE চাপুন।`;
-      clearResultDisplay("ফিডব্যাক গৃহীত হয়েছে। নতুন সিকোয়েন্স অ্যানালাইসিস করতে ANALYZE চাপুন।");
-      setMsg(`ওয়েট আপডেট হয়েছে (${actualOutcome} ${actualNum})।`);
-    });
-
-    function downloadFile(filename, content, mimeType) {
-      const blob = new Blob([content], { type: mimeType });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = filename;
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    exportCsvBtn.addEventListener("click", () => {
-      if (!records.length) {
-        setMsg("এক্সপোর্ট করার মতো কোনো ডেটা নেই۔");
-        return;
-      }
-      const rows = ["id,fileName,digits,outcome,source,time"];
-      records.forEach((r) => {
-        rows.push(`"${r.id}","${r.fileName || ""}","${r.digits.join("-")}","${r.outcome}","${r.source}","${r.time}"`);
-      });
-      downloadFile("dk-win-ai-records.csv", rows.join("\n"), "text/csv;charset=utf-8;");
-      addLog("📥 ডেটাবেজ CSV ফরম্যাটে এক্সপোর্ট করা হয়েছে۔");
-      setMsg("CSV ফাইল ডাউনলোড হয়েছে।");
-    });
-
-    exportJsonBtn.addEventListener("click", () => {
-      if (!records.length) {
-        setMsg("ব্যাকআপ করার মতো কোনো ডেটা নেই۔");
-        return;
-      }
-      downloadFile("dk-win-ai-backup.json", JSON.stringify({ records, feedbacks, learningLogs }, null, 2), "application/json");
-      addLog("💾 সম্পূর্ণ মেমোরি ব্যাকআপ (JSON) ডাউনলোড করা হয়েছে۔");
-      setMsg("JSON ব্যাকআপ ফাইল ডাউনলোড হয়েছে।");
-    });
-
-    importJsonInput.addEventListener("change", async (e) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-      try {
-        const text = await file.text();
-        const parsed = JSON.parse(text);
-        if (Array.isArray(parsed)) {
-          records = parsed;
-        } else if (parsed && Array.isArray(parsed.records)) {
-          records = parsed.records;
-          feedbacks = Array.isArray(parsed.feedbacks) ? parsed.feedbacks : [];
-          if (Array.isArray(parsed.learningLogs)) learningLogs = parsed.learningLogs;
-        } else {
-          throw new Error("Invalid format");
-        }
-        clearResultDisplay();
-        saveAndRender();
-        addLog(`📂 ডেটাবেজ ইমপোর্ট সম্পন্ন। মোট রেকর্ড সংখ্যা: ${records.length}۔`);
-        setMsg(`${records.length}টি রেকর্ড ইমপোর্ট হয়েছে।`);
-      } catch {
-        setMsg("সঠিক JSON ব্যাকআপ ফাইল সিলেক্ট করুন।");
-      }
-      e.target.value = "";
-    });
-
-    renderLogs();
-    saveAndRender();
-  </script>
+ </div>
+ <div class="card" style="margin-top:15px"><div class="card-head"><h2>Recent Records</h2><button class="btn" data-go="history">সব দেখুন</button></div><div class="table-wrap"><table><thead><tr><th>সময়</th><th>সিকোয়েন্স</th><th>ক্যাটাগরি</th><th>উৎস</th></tr></thead><tbody id="recentRows"><tr><td colspan="4" class="muted">কোনো রেকর্ড নেই</td></tr></tbody></table></div></div>
+</section>
+
+<section class="page" id="page-analysis">
+ <div class="grid two">
+  <div class="card"><div class="card-head"><h2>Four Digit Analysis</h2><span class="badge">0–9</span></div><p class="sub">যে চার অঙ্কের সিকোয়েন্স বিশ্লেষণ করতে চান তা লিখুন।</p><div class="digits" style="margin:15px 0"><input id="d1" inputmode="numeric" maxlength="1" placeholder="0"><input id="d2" inputmode="numeric" maxlength="1" placeholder="0"><input id="d3" inputmode="numeric" maxlength="1" placeholder="0"><input id="d4" inputmode="numeric" maxlength="1" placeholder="0"></div><div class="actions"><button class="btn primary" id="analyzeBtn">ANALYZE NOW</button><button class="btn" id="clearAnalysis">Clear</button></div><div class="notice" id="analysisMessage">অন্তত ১টি বৈধ রেকর্ড থাকলেই বেসলাইন বিশ্লেষণ করা যাবে। বেশি ডেটায় শর্তভিত্তিক হিসাব তুলনামূলক স্থিতিশীল হতে পারে।</div></div>
+  <div class="card"><div class="card-head"><h2>Ensemble Probability</h2><span class="badge">10 ENGINES</span></div><div class="result-grid"><div class="result big"><span>BIG</span><strong id="analysisBig">—%</strong><div class="meter"><i id="bigMeter" style="width:0%"></i></div></div><div class="result small"><span>SMALL</span><strong id="analysisSmall">—%</strong><div class="meter"><i id="smallMeter" style="width:0%;background:var(--red)"></i></div></div></div><p class="sub" id="analysisSummary" style="margin-top:12px">ফলাফল এখানে দেখা যাবে।</p></div>
+ </div>
+ <div class="card" style="margin-top:15px"><div class="card-head"><h2>Engine Breakdown</h2><span class="sub">প্রতিটি ইঞ্জিনের আলাদা অনুমান</span></div><div class="engine-list" id="engineList"></div></div>
+ <div class="notice warn">গুরুত্বপূর্ণ: BIG/SMALL নির্ধারণ এখানে শেষ অঙ্কের ৫–৯ / ০–৪ শ্রেণিবিভাগ ধরে করা হয়। এটি কোনো গেমের ফল নিশ্চিতভাবে অনুমান করে না।</div>
+</section>
+
+<section class="page" id="page-prediction">
+ <div class="grid two">
+  <div class="card"><div class="card-head"><h2>Latest Prediction</h2><span class="badge">MODEL OUTPUT</span></div><div class="result-grid"><div class="result big"><span>BIG</span><strong id="predBig">—%</strong></div><div class="result small"><span>SMALL</span><strong id="predSmall">—%</strong></div></div><p id="predDetail" class="sub" style="margin-top:12px">Analysis পেজ থেকে প্রথমে একটি প্রেডিকশন তৈরি করুন।</p></div>
+  <div class="card"><div class="card-head"><h2>Actual Result Feedback</h2><span class="badge">VALIDATION</span></div><p class="sub">প্রকৃত ফলাফলের শেষ অঙ্ক লিখুন। BIG/SMALL স্বয়ংক্রিয়ভাবে নির্ধারিত হবে।</p><input id="actualNumber" class="feedback-input" inputmode="numeric" maxlength="1" placeholder="0–9" style="margin:14px 0"><button class="btn primary" id="feedbackBtn" style="width:100%">ফলাফল সংরক্ষণ ও যাচাই</button><p class="sub" id="feedbackMessage" style="margin-top:10px">শেষ প্রেডিকশন না থাকলেও ফলাফল রেকর্ড করা যাবে, তবে সেটি accuracy-তে গণনা হবে না।</p></div>
+ </div>
+ <div class="card" style="margin-top:15px"><div class="card-head"><h2>Learning & Validation Log</h2><button class="btn" id="clearLogs">লগ পরিষ্কার</button></div><div class="log" id="logs"></div></div>
+</section>
+
+<section class="page" id="page-history">
+ <div class="card"><div class="card-head"><h2>Complete Record History</h2><div class="actions"><button class="btn" id="exportCsv">CSV EXPORT</button><button class="btn" id="exportJson">JSON BACKUP</button></div></div><div class="table-wrap"><table><thead><tr><th>সময়</th><th>সিকোয়েন্স</th><th>BIG/SMALL</th><th>উৎস</th><th>অ্যাকশন</th></tr></thead><tbody id="historyRows"></tbody></table></div></div>
+ <div class="card" style="margin-top:15px"><div class="card-head"><h2>Feedback History</h2></div><div class="table-wrap"><table><thead><tr><th>সময়</th><th>প্রেডিকশন</th><th>প্রকৃত</th><th>স্ট্যাটাস</th></tr></thead><tbody id="feedbackRows"></tbody></table></div></div>
+</section>
+
+<section class="page" id="page-settings">
+ <div class="grid two">
+  <div class="card"><div class="card-head"><h2>Data Management</h2></div><p class="sub">JSON ব্যাকআপ থেকে আগের রেকর্ড ও ফিডব্যাক পুনরুদ্ধার করুন।</p><div class="actions" style="margin:15px 0"><label class="btn" for="importFile">JSON IMPORT</label><input id="importFile" class="hidden" type="file" accept=".json,application/json"><button class="btn danger" id="resetBtn">সব ডেটা মুছুন</button></div><div class="notice warn">Reset করলে এই ব্রাউজারের DK WIN AI ডেটা মুছে যাবে। আগে ব্যাকআপ নিন।</div></div>
+  <div class="card"><div class="card-head"><h2>Preferences</h2></div><label class="sub">সর্বোচ্চ সংরক্ষিত রেকর্ড</label><select id="maxRecords" class="field" style="margin:8px 0 14px"><option value="500">500</option><option value="1000">1000</option><option value="2500">2500</option><option value="5000">5000</option><option value="10000">10000</option></select><button class="btn primary" id="saveSettings">সেটিংস সংরক্ষণ</button><p class="sub" style="margin-top:12px">ডেটা আপনার ব্রাউজারের localStorage-এ থাকে; অন্য ডিভাইসে স্বয়ংক্রিয়ভাবে যায় না।</p></div>
+ </div>
+</section>
+
+<section class="page" id="page-help">
+ <div class="card"><h2>ব্যবহার নির্দেশিকা</h2><ol style="padding-left:20px;color:#c5cce8;display:grid;gap:10px;margin-top:14px"><li>স্ক্রিনশট আপলোড করুন। OCR চার অঙ্ক খুঁজবে; ভুল বা অসম্পূর্ণ পড়া হলে রেকর্ড যোগ হবে না।</li><li>OCR রেকর্ড History থেকে যাচাই করুন। প্রয়োজনে JSON ব্যাকআপ রাখুন।</li><li>Analysis-এ চারটি অঙ্ক লিখে Analyze চাপুন। ইঞ্জিনগুলো সংরক্ষিত রেকর্ডের পরিসংখ্যান ব্যবহার করবে।</li><li>প্রকৃত ফলাফল Prediction পেজে জমা দিন। শুধু আগের প্রেডিকশনের সঙ্গে তুলনাযোগ্য ফিডব্যাক accuracy-তে গণনা হবে।</li><li>ডেমো ডেটা আলাদা উৎস হিসেবে চিহ্নিত থাকে এবং বাস্তব রেকর্ড বলে দেখানো হয় না।</li></ol><div class="notice warn">কোনো অ্যালগরিদম এলোমেলো বা স্বাধীন ফলাফলের নিশ্চয়তা দিতে পারে না। প্রদর্শিত probability ঐতিহাসিক ডেটার বর্ণনা, নিশ্চিত ভবিষ্যদ্বাণী বা জয়ের পরামর্শ নয়।</div></div>
+</section>
+<div class="footer">DK WIN AI • Local-first sequence analytics • Not a guaranteed prediction system</div>
+</main></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const KEYS = {records:'dk_win_ai_records_v8',feedback:'dk_win_ai_feedback_v8',logs:'dk_win_ai_logs_v8',settings:'dk_win_ai_settings_v8'};
+const LEGACY = {
+ records:['dk_win_ai_records_v7','dk_win_ai_records_v6'],
+ feedback:['dk_win_ai_feedback_v7','dk_win_ai_feedback_v6'],
+ logs:['dk_win_ai_logs_v7','dk_win_ai_logs_v6']
+};
+const state = {records:[],feedbacks:[],logs:[],settings:{maxRecords:5000},lastPrediction:null,engines:[]};
+const pages = ['dashboard','analysis','prediction','history','settings','help'];
+const esc = s => String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600)}
+function log(msg){state.logs.unshift({time:new Date().toISOString(),message:msg});state.logs=state.logs.slice(0,100);persist();renderLogs()}
+function validDigitArray(a){return Array.isArray(a)&&a.length===4&&a.every(x=>Number.isInteger(Number(x))&&Number(x)>=0&&Number(x)<=9)}
+function normalizeRecord(r,i=0){
+ if(!r||typeof r!=='object'||!validDigitArray(r.digits))return null;
+ const digits=r.digits.map(Number), inferred=digits[3]>=5?'BIG':'SMALL';
+ return {id:String(r.id||`import-${Date.now()}-${i}`),digits,outcome:inferred,source:String(r.source||'import').slice(0,40),time:(r.time&&Number.isFinite(Date.parse(r.time)))?new Date(r.time).toISOString():new Date().toISOString(),fileName:String(r.fileName||'').slice(0,180),fileHash:String(r.fileHash||'').slice(0,120),actualNumber:Number.isInteger(Number(r.actualNumber))?Number(r.actualNumber):null};
+}
+function persist(){try{localStorage.setItem(KEYS.records,JSON.stringify(state.records));localStorage.setItem(KEYS.feedback,JSON.stringify(state.feedbacks));localStorage.setItem(KEYS.logs,JSON.stringify(state.logs));localStorage.setItem(KEYS.settings,JSON.stringify(state.settings))}catch(e){toast('Storage পূর্ণ হতে পারে; JSON ব্যাকআপ নিন।')}}
+function readArray(key){try{const v=JSON.parse(localStorage.getItem(key)||'[]');return Array.isArray(v)?v:[]}catch{return []}}
+function init(){
+ let raw=readArray(KEYS.records);
+ if(!raw.length){for(const k of LEGACY.records){const old=readArray(k);if(old.length){raw=old;break}}}
+ const oldFeedback=readArray(KEYS.feedback);
+ const oldLogs=readArray(KEYS.logs);
+ state.records=raw.map(normalizeRecord).filter(Boolean).slice(-state.settings.maxRecords);
+ const feedbackSource=oldFeedback.length?oldFeedback:LEGACY.feedback.map(readArray).find(a=>a.length)||[];
+ state.feedbacks=feedbackSource.filter(f=>f&&typeof f==='object'&&['BIG','SMALL','NONE'].includes(f.predictedOutcome)&&['BIG','SMALL'].includes(f.actualOutcome));
+ const logSource=oldLogs.length?oldLogs:LEGACY.logs.map(readArray).find(a=>a.length)||[];
+ state.logs=logSource.filter(x=>typeof x==='string'||(x&&typeof x.message==='string')).map(x=>typeof x==='string'?{time:new Date().toISOString(),message:x}:x).slice(0,100);
+ try{const s=JSON.parse(localStorage.getItem(KEYS.settings)||'{}');if([500,1000,2500,5000,10000].includes(Number(s.maxRecords)))state.settings.maxRecords=Number(s.maxRecords)}catch{}
+ $('maxRecords').value=String(state.settings.maxRecords);renderAll();
+}
+function outcome(r){return r.digits[3]>=5?'BIG':'SMALL'}
+function rate(list){return list.length?list.filter(r=>outcome(r)==='BIG').length/list.length:0.5}
+function pct(v){return `${Math.round(Math.max(0,Math.min(1,v))*100)}%`}
+function showPage(p){if(!pages.includes(p))return;pages.forEach(x=>$('page-'+x).classList.toggle('active',x===p));document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===p));$('pageTitle').textContent=({dashboard:'Dashboard',analysis:'Analysis',prediction:'Prediction',history:'History',settings:'Settings',help:'Help & Guide'})[p];$('sidebar').classList.remove('open')}
+$('nav').addEventListener('click',e=>{const b=e.target.closest('[data-page]');if(b)showPage(b.dataset.page)});
+document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.go)));
+$('menuBtn').addEventListener('click',()=>$('sidebar').classList.toggle('open'));
+function renderAll(){renderStats();renderTables();renderLogs();renderCollector()}
+function renderStats(){
+ const n=state.records.length,checked=state.feedbacks.filter(f=>f.matched===true||f.matched===false),wins=checked.filter(f=>f.matched).length;
+ $('statRecords').textContent=n;$('statFeedback').textContent=state.feedbacks.length;$('statAccuracy').textContent=checked.length?pct(wins/checked.length):'—';
+ $('statUpdated').textContent=state.records.length?new Date(state.records[state.records.length-1].time).toLocaleDateString():'—';
+ $('recordBadge').textContent=`${n} RECORDS`;
+ const latest=state.lastPrediction;$('dashBig').textContent=latest?pct(latest.big):'—%';$('dashSmall').textContent=latest?pct(1-latest.big):'—%';
+ $('dashPredictionNote').textContent=latest?`সিকোয়েন্স ${latest.sequence} • ${latest.label} • ঐতিহাসিক হিসাব`:'Analysis পেজে চার অঙ্ক দিয়ে হিসাব শুরু করুন।';
+}
+function rowHTML(r,actions=false){const cat=outcome(r);return `<tr><td>${esc(new Date(r.time).toLocaleString())}</td><td><b>${r.digits.join('')}</b></td><td><span class="pill ${cat.toLowerCase()}">${cat}</span></td><td>${esc(r.source)}</td>${actions?`<td><button class="btn danger delete-record" data-id="${esc(r.id)}">Delete</button></td>`:''}</tr>`}
+function renderTables(){
+ const recent=state.records.slice(-6).reverse();$('recentRows').innerHTML=recent.length?recent.map(r=>rowHTML(r)).join(''):'<tr><td colspan="4" class="muted">কোনো রেকর্ড নেই</td></tr>';
+ $('historyRows').innerHTML=state.records.slice().reverse().map(r=>rowHTML(r,true)).join('')||'<tr><td colspan="5" class="muted">কোনো রেকর্ড নেই</td></tr>';
+ $('feedbackRows').innerHTML=state.feedbacks.slice().reverse().map(f=>`<tr><td>${esc(new Date(f.time).toLocaleString())}</td><td>${esc(f.predictedOutcome)}</td><td>${esc(f.actualOutcome)} ${esc(f.actualNumber)}</td><td>${f.matched===true?'<span class="pill big">MATCH</span>':f.matched===false?'<span class="pill small">MISS</span>':'—'}</td></tr>`).join('')||'<tr><td colspan="4" class="muted">ফিডব্যাক নেই</td></tr>';
+}
+$('historyRows').addEventListener('click',e=>{const b=e.target.closest('.delete-record');if(!b)return;state.records=state.records.filter(r=>r.id!==b.dataset.id);persist();renderAll();toast('রেকর্ড মুছে ফেলা হয়েছে')});
+function renderLogs(){$('logs').innerHTML=state.logs.map(l=>`<div class="log-item">${esc(new Date(l.time).toLocaleString())} — ${esc(l.message)}</div>`).join('')||'<div class="muted small">এখনো কোনো লগ নেই।</div>'}
+function renderCollector(){const n=state.records.length,max=state.settings.maxRecords;$('collectProgress').style.width=`${Math.min(100,n/max)*100}%`;$('collectText').textContent=`${n} / ${max} রেকর্ড • বাস্তব ও ডেমো উৎস আলাদা চিহ্নিত।`}
+function addRecord(digits,source,extra={}){const r=normalizeRecord({id:`${source}-${Date.now()}-${Math.random().toString(36).slice(2,7)}`,digits,source,time:new Date().toISOString(),...extra});if(!r)return false;if(state.records.some(x=>extra.fileHash&&x.fileHash===extra.fileHash))return false;state.records.push(r);state.records=state.records.slice(-state.settings.maxRecords);return true}
+async function sha256(file){const buf=await file.arrayBuffer();const digest=await crypto.subtle.digest('SHA-256',buf);return [...new Uint8Array(digest)].map(b=>b.toString(16).padStart(2,'0')).join('')}
+function parseOCR(text){
+ const lines=text.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+ const candidates=[];
+ for(const line of lines){const matches=line.match(/(?<!\d)\d{4}(?!\d)/g)||[];for(const m of matches)candidates.push(m)}
+ if(candidates.length===1)return candidates[0].split('').map(Number);
+ if(candidates.length>1){const uniq=[...new Set(candidates)];if(uniq.length===1)return uniq[0].split('').map(Number)}
+ return null;
+}
+$('screenshots').addEventListener('change',async e=>{
+ const files=[...e.target.files||[]].filter(f=>f.type.startsWith('image/'));if(!files.length)return;
+ const input=e.target;input.disabled=true;let added=0,skipped=0,failed=0;
+ for(let i=0;i<files.length;i++){const file=files[i];$('collectText').textContent=`OCR চলছে: ${i+1}/${files.length} — ${file.name}`;
+  try{const hash=await sha256(file);if(state.records.some(r=>r.fileHash===hash)){skipped++;continue}
+   if(!window.Tesseract)throw Error('OCR library unavailable');
+   const result=await Tesseract.recognize(file,'eng');const digits=parseOCR(result.data.text);
+   if(!digits){failed++;continue}
+   if(addRecord(digits,'screenshot_ocr',{fileName:file.name,fileHash:hash}))added++;else skipped++;
+  }catch(err){failed++;console.warn(err)}
+  persist();renderAll();
+ }
+ input.disabled=false;input.value='';$('collectText').textContent=`OCR শেষ: ${added}টি যোগ, ${skipped}টি ডুপ্লিকেট, ${failed}টি যাচাই/পড়া যায়নি।`;log(`OCR batch: ${added} added, ${skipped} duplicate, ${failed} failed`);toast(`${added}টি রেকর্ড যোগ হয়েছে`);
+});
+$('demoBtn').addEventListener('click',()=>{
+ const count=Math.min(50,Math.max(0,state.settings.maxRecords-state.records.length));if(!count){toast('রেকর্ড সীমা পূর্ণ');return}
+ // Deterministic, explicitly labelled demo sequence; never represented as observed results.
+ const start=state.records.filter(r=>r.source==='demo_seed').length;
+ for(let i=0;i<count;i++){const k=start+i;const digits=[(k*7+2)%10,(k*3+1)%10,(k*9+4)%10,(k*5+6)%10];addRecord(digits,'demo_seed')}
+ persist();renderAll();log(`${count} demo-only records added`);toast(`${count}টি ডেমো রেকর্ড যোগ হয়েছে`);
+});
+function clamp(v){return Math.max(.01,Math.min(.99,v))}
+function analyze(seq){
+ const real=state.records.filter(r=>r.source!=='demo_seed'),data=real.length?real:state.records;
+ if(!data.length)return null;
+ const ys=data.map(outcome),base=rate(data),last=seq[3],eng=[];
+ const add=(name,p,weight)=>eng.push({name,p:clamp(p),weight});
+ // 1. Overall historical frequency
+ add('Historical frequency',base,.8);
+ // 2. Recent window prevalence
+ const recent=data.slice(-Math.min(30,data.length));add('Recent window',rate(recent),1.1);
+ // 3. Exponential decay prevalence
+ let num=0,den=0;ys.forEach((y,i)=>{const w=Math.pow(.965,ys.length-1-i);num+=(y==='BIG'?1:0)*w;den+=w});add('Exponential average',den?num/den:base,1);
+ // 4. Last outcome transition
+ const transitions={BIG:0,SMALL:0};for(let i=1;i<ys.length;i++)if(ys[i-1]===ys[ys.length-1])transitions[ys[i]]++;
+ add('First-order Markov',(transitions.BIG+1)/(transitions.BIG+transitions.SMALL+2),1);
+ // 5. Last two outcome context
+ const ctx2={BIG:0,SMALL:0};for(let i=2;i<ys.length;i++)if(ys[i-2]===ys[ys.length-2]&&ys[i-1]===ys[ys.length-1])ctx2[ys[i]]++;
+ add('2-step Markov',(ctx2.BIG+1)/(ctx2.BIG+ctx2.SMALL+2),1.15);
+ // 6. Last digit conditioned frequency
+ const digitMatches=data.filter(r=>r.digits[3]===last);add('Last digit context',digitMatches.length?rate(digitMatches):base,.9);
+ // 7. Last two input digits as suffix context
+ const suffix=seq.slice(-2).join(''),suffixMatches=data.filter(r=>r.digits.slice(-2).join('')===suffix);add('2-digit suffix',suffixMatches.length?rate(suffixMatches):base,1.1);
+ // 8. Last digit parity group, with smoothing
+ const parity=data.filter(r=>r.digits[3]%2===last%2);add('Parity group',parity.length?(parity.filter(r=>outcome(r)==='BIG').length+1)/(parity.length+2):base,.65);
+ // 9. Beta-binomial posterior from recent records
+ const betaData=data.slice(-100),b=betaData.filter(r=>outcome(r)==='BIG').length,s=betaData.length-b;add('Bayesian posterior',(b+2)/(b+s+4),1);
+ // 10. Rolling trend blend; not a reinforcement-learning claim
+ const older=data.slice(-Math.min(100,data.length),-Math.min(25,data.length)),newer=data.slice(-Math.min(25,data.length));const trend=older.length?clamp(.5+(rate(newer)-rate(older))*.35):base;add('Trend adjustment',trend,.7);
+ const sum=eng.reduce((a,x)=>a+x.weight,0),p=eng.reduce((a,x)=>a+x.p*x.weight,0)/sum;
+ return {big:clamp(p),engines:eng,sequence:seq.join(''),n:data.length,usingDemoOnly:!real.length,label:!real.length?'ডেমো ডেটা':'বাস্তব/ইমপোর্ট ডেটা'};
+}
+function renderAnalysis(result){
+ $('analysisBig').textContent=pct(result.big);$('analysisSmall').textContent=pct(1-result.big);$('bigMeter').style.width=pct(result.big);$('smallMeter').style.width=pct(1-result.big);
+ $('analysisSummary').textContent=`${result.sequence} • ${result.n}টি ${result.usingDemoOnly?'ডেমো':'নন-ডেমো'} রেকর্ড বিশ্লেষিত • ${result.label}`;
+ $('engineList').innerHTML=result.engines.map(e=>`<div class="engine"><b>${esc(e.name)}</b><div class="meter"><i style="width:${pct(e.p)}"></i></div><span>${pct(e.p)}</span></div>`).join('');
+ $('predBig').textContent=pct(result.big);$('predSmall').textContent=pct(1-result.big);$('predDetail').textContent=`সিকোয়েন্স ${result.sequence} • ${result.n} রেকর্ড • ${result.label}`;
+ $('dashBig').textContent=pct(result.big);$('dashSmall').textContent=pct(1-result.big);$('dashPredictionNote').textContent=`${result.sequence} • ${result.label}`;
+}
+$('analyzeBtn').addEventListener('click',()=>{
+ const fields=[1,2,3,4].map(i=>$('d'+i).value.trim());if(fields.some(x=>!/^[0-9]$/.test(x))){$('analysisMessage').textContent='চারটি ঘরেই ০–৯ এর একটি করে অঙ্ক দিন।';return}
+ const r=analyze(fields.map(Number));if(!r){$('analysisMessage').textContent='আগে অন্তত একটি বৈধ রেকর্ড যোগ করুন।';return}
+ state.lastPrediction={...r,predictedOutcome:r.big>=.5?'BIG':'SMALL',time:new Date().toISOString()};renderAnalysis(r);$('analysisMessage').textContent='হিসাব সম্পন্ন। এটি অতীতের ডেটাভিত্তিক আনুমানিক সম্ভাবনা, নিশ্চিত ফল নয়।';log(`Analysis ${r.sequence}: BIG ${pct(r.big)} / SMALL ${pct(1-r.big)}`);showPage('analysis');
+});
+$('clearAnalysis').addEventListener('click',()=>{[1,2,3,4].forEach(i=>$('d'+i).value='');$('analysisMessage').textContent='ইনপুট পরিষ্কার করা হয়েছে।'});
+[1,2,3,4].forEach((i,idx)=>$('d'+i).addEventListener('input',e=>{e.target.value=e.target.value.replace(/\D/g,'').slice(-1);if(e.target.value&&idx<4)$('d'+(idx+2)).focus()}));
+$('actualNumber').addEventListener('input',e=>e.target.value=e.target.value.replace(/\D/g,'').slice(-1));
+$('feedbackBtn').addEventListener('click',()=>{
+ const raw=$('actualNumber').value;if(!/^[0-9]$/.test(raw)){$('feedbackMessage').textContent='০ থেকে ৯ এর মধ্যে একটি অঙ্ক দিন।';return}
+ const n=Number(raw),actual=n>=5?'BIG':'SMALL',pred=state.lastPrediction?.predictedOutcome||'NONE',matched=pred==='NONE'?null:pred===actual;
+ const item={time:new Date().toISOString(),predictedOutcome:pred,actualOutcome:actual,actualNumber:n,matched,sequence:state.lastPrediction?.sequence||null};state.feedbacks.push(item);
+ addRecord([0,0,0,n],'live_feedback',{actualNumber:n});$('actualNumber').value='';state.lastPrediction=null;persist();renderAll();
+ $('feedbackMessage').textContent=matched===null?`${actual} ${n} সংরক্ষিত; তুলনা করার মতো প্রেডিকশন ছিল না।`:matched?`সঠিক মিল: ${actual} ${n}`:`মিল হয়নি: প্রেডিকশন ${pred}, প্রকৃত ${actual} ${n}`;
+ log(`Feedback actual ${actual} ${n}; match=${matched===null?'not-scored':matched}`);toast('ফলাফল সংরক্ষণ হয়েছে');
+});
+function download(name,content,type){const blob=new Blob([content],{type}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+function csvCell(v){return '"'+String(v??'').replace(/"/g,'""')+'"'}
+function exportCSV(){const rows=[['id','time','digits','outcome','source','fileName'],...state.records.map(r=>[r.id,r.time,r.digits.join(''),outcome(r),r.source,r.fileName])];download('dk-win-ai-records.csv','\uFEFF'+rows.map(r=>r.map(csvCell).join(',')).join('\r\n'),'text/csv;charset=utf-8')}
+function exportJSON(){download('dk-win-ai-backup.json',JSON.stringify({version:8,records:state.records,feedbacks:state.feedbacks,logs:state.logs,settings:state.settings},null,2),'application/json')}
+$('exportCsv').addEventListener('click',exportCSV);$('exportJson').addEventListener('click',exportJSON);
+$('importFile').addEventListener('change',async e=>{const f=e.target.files?.[0];if(!f)return;try{const p=JSON.parse(await f.text());if(!p||(!Array.isArray(p.records)&&!Array.isArray(p)))throw Error('format');const raw=Array.isArray(p)?p:p.records;const clean=raw.map(normalizeRecord).filter(Boolean);if(!clean.length&&raw.length)throw Error('invalid records');state.records=clean.slice(-state.settings.maxRecords);if(!Array.isArray(p)){state.feedbacks=Array.isArray(p.feedbacks)?p.feedbacks.filter(x=>x&&['BIG','SMALL','NONE'].includes(x.predictedOutcome)&&['BIG','SMALL'].includes(x.actualOutcome)):[];state.logs=Array.isArray(p.logs)?p.logs.filter(x=>x&&typeof x.message==='string').slice(0,100):state.logs}persist();renderAll();log(`Imported ${clean.length} validated records`);toast(`${clean.length}টি বৈধ রেকর্ড ইমপোর্ট হয়েছে`)}catch{toast('JSON ফাইলের ফরম্যাট সঠিক নয় বা ডেটা অবৈধ')}e.target.value=''});
+$('saveSettings').addEventListener('click',()=>{state.settings.maxRecords=Number($('maxRecords').value);state.records=state.records.slice(-state.settings.maxRecords);persist();renderAll();toast('সেটিংস সংরক্ষিত')});
+$('resetBtn').addEventListener('click',()=>{if(!confirm('এই ব্রাউজারের সব DK WIN AI রেকর্ড, ফিডব্যাক ও লগ মুছবেন? আগে ব্যাকআপ নিয়েছেন কি?'))return;state.records=[];state.feedbacks=[];state.logs=[];state.lastPrediction=null;persist();renderAll();toast('ডেটা মুছে ফেলা হয়েছে')});
+$('clearLogs').addEventListener('click',()=>{state.logs=[];persist();renderLogs();toast('লগ পরিষ্কার হয়েছে')});
+init();
+})();
+</script>
 </body>
-  </html>
+</html>
